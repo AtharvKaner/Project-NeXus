@@ -260,6 +260,11 @@ function StudentDashboard({ user }) {
     }
   };
 
+  const handleDownloadLocker = () => {
+    const studentId = encodeURIComponent(user.identifier || '');
+    window.open(`${API_URL}/api/download-locker/${studentId}`, '_blank');
+  };
+
   const isFormComplete = documents.idCard && documents.libraryReceipt && documents.labClearance && !hasUnpaidDues;
 
   const handleSubmitRequest = async () => {
@@ -563,6 +568,12 @@ function StudentDashboard({ user }) {
                       onClick={handleDownloadCertificate}
                     >
                       Download PDF
+                    </button>
+                    <button
+                      className="glow-button px-6 py-3"
+                      onClick={handleDownloadLocker}
+                    >
+                      Download Locker
                     </button>
                   </div>
                 </div>

@@ -20,11 +20,11 @@ function LandingPage() {
         Project Nexus
       </div>
 
-      <h1 className="max-w-4xl text-4xl font-black tracking-tight text-white sm:text-5xl md:text-7xl">
+      <h1 className="mb-5 max-w-4xl text-3xl font-black tracking-tight text-white sm:text-4xl lg:text-5xl">
         Streamlined Institutional <span className="bg-gradient-to-r from-cyan-300 via-violet-300 to-fuchsia-300 bg-clip-text text-transparent">Clearance</span>
       </h1>
 
-      <p className="mt-6 max-w-3xl text-base leading-8 text-slate-300 sm:text-lg md:text-xl">
+      <p className="max-w-3xl text-sm leading-7 text-slate-300 sm:text-base md:text-lg">
         A premium, multi-stage approval workflow designed for educational institutions to automate clearance, dues, and certification with confidence.
       </p>
 

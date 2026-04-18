@@ -7,6 +7,16 @@ export default defineConfig({
   server: {
     host: true,          // allow external access (ngrok, IP)
     port: 5175,          // optional: fix your current port
-    allowedHosts: ['fragrant-setback-nursing.ngrok-free.dev']
+    allowedHosts: ['fragrant-setback-nursing.ngrok-free.dev'],
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3000',
+        changeOrigin: true
+      },
+      '/download-locker': {
+        target: 'http://localhost:3000',
+        changeOrigin: true
+      }
+    }
   }
 })

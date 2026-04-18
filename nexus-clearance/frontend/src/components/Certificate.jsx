@@ -86,18 +86,18 @@ function Certificate({ request, dues = [] }) {
             </div>
           </div>
 
-          <div className="mt-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/15 bg-emerald-500/10 px-4 py-2 text-sm font-semibold text-emerald-700">
+          <div className="mt-10 flex flex-col items-center gap-4 md:flex-row md:items-end md:justify-between">
+            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/15 bg-emerald-500/10 px-4 py-2 text-sm font-semibold text-emerald-700 md:self-end">
               <ShieldCheck size={16} /> Official document
             </div>
-            <div className="rounded-3xl border border-cyan-400/20 bg-cyan-500/5 p-4 shadow-[0_0_0_1px_rgba(34,211,238,0.08),0_0_30px_rgba(34,211,238,0.12)]">
+            <div className="w-full max-w-[250px] rounded-3xl border border-cyan-400/20 bg-cyan-500/5 p-3 text-center shadow-[0_0_0_1px_rgba(34,211,238,0.08),0_0_30px_rgba(34,211,238,0.12)] md:ml-auto">
               <div className="mb-3 text-[10px] font-bold uppercase tracking-[0.28em] text-slate-500">Verification QR</div>
-              <div className="grid grid-cols-21 gap-[2px] rounded-2xl border border-slate-200 bg-white p-3 shadow-inner">
+              <div className="mx-auto grid h-36 w-36 grid-cols-21 overflow-hidden rounded-xl border border-slate-200 bg-white p-1 shadow-inner">
                 {qrMatrix.flatMap((row, rowIndex) =>
                   row.map((cell, colIndex) => (
-                    <span
+                    <div
                       key={`${rowIndex}-${colIndex}`}
-                      className={`block h-1.5 w-1.5 rounded-[2px] ${cell ? 'bg-slate-900' : 'bg-transparent'}`}
+                      className={`aspect-square w-full ${cell ? 'bg-slate-900' : 'bg-white'}`}
                     />
                   ))
                 )}
@@ -105,7 +105,7 @@ function Certificate({ request, dues = [] }) {
               <div className="mt-2 text-center text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500">
                 Scan to verify authenticity
               </div>
-              <div className="mt-2 max-w-[220px] truncate text-center text-[11px] font-mono text-slate-500">{verifyUrl}</div>
+              <div className="mx-auto mt-2 max-w-[220px] truncate text-center text-[11px] font-mono text-slate-500">{verifyUrl}</div>
             </div>
           </div>
 

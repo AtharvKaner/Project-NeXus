@@ -7,6 +7,7 @@ const jwt = require('jsonwebtoken');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const archiver = require('archiver');
 const { createObjectCsvWriter } = require('csv-writer');
 const PDFDocument = require('pdfkit');
 const QRCode = require('qrcode');
@@ -82,6 +83,50 @@ const formatDate = (dateValue) => {
 };
 
 const generateCertId = () => `CERT-${Date.now()}-${crypto.randomBytes(3).toString('hex').toUpperCase()}`;
+
+const streamToBuffer = (stream) => new Promise((resolve, reject) => {
+  const chunks = [];
+  stream.on('data', (chunk) => chunks.push(chunk));
+  stream.on('end', () => resolve(Buffer.concat(chunks)));
+  stream.on('error', reject);
+});
+
+const safeFileName = (value) => (value || 'file')
+  .toString()
+  .replace(/[\\/:*?"<>|]+/g, '_')
+  .replace(/\s+/g, ' ')
+  .trim();
+
+const dataUrlToFile = (dataUrl, originalName) => {
+  if (!dataUrl || typeof dataUrl !== 'string') return null;
+
+  const match = dataUrl.match(/^data:([^;]+);base64,(.+)$/);
+  if (!match) return null;
+
+  const mimeType = match[1] || 'application/octet-stream';
+  const base64Payload = match[2] || '';
+  const mimeToExtension = {
+    'application/pdf': 'pdf',
+    'image/jpeg': 'jpg',
+    'image/jpg': 'jpg',
+    'image/png': 'png',
+    'image/webp': 'webp'
+  };
+
+  const parsedName = safeFileName(originalName || 'document');
+  const hasExtension = /\.[a-zA-Z0-9]+$/.test(parsedName);
+  const fallbackExt = mimeToExtension[mimeType] || 'bin';
+  const fileName = hasExtension ? parsedName : `${parsedName}.${fallbackExt}`;
+
+  try {
+    return {
+      fileName,
+      buffer: Buffer.from(base64Payload, 'base64')
+    };
+  } catch (_error) {
+    return null;
+  }
+};
 
 const buildNoDuesCertificatePdf = async ({ request, dueRecords, verificationUrl, certId }) => {
   const doc = new PDFDocument({
@@ -189,7 +234,6 @@ const buildNoDuesCertificatePdf = async ({ request, dueRecords, verificationUrl,
   doc.fillColor('#334155').font('Helvetica-Bold').fontSize(7.5);
   doc.text('Scan to verify authenticity', qrX - 12, qrY + 114, { width: 135, align: 'center' });
 
-  doc.end();
   return doc;
 };
 
@@ -653,11 +697,124 @@ app.get('/api/requests/:id/certificate/pdf', authMiddleware, async (req, res) =>
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
     pdf.pipe(res);
+    pdf.end();
   } catch (error) {
     console.error('Failed to generate certificate PDF:', error);
     res.status(500).json({ message: 'Failed to generate certificate PDF' });
   }
 });
+
+const downloadLockerHandler = async (req, res) => {
+  try {
+    const studentIdParam = (req.params.studentId || '').toString().trim();
+    const normalizedStudentId = studentIdParam.toLowerCase();
+
+    if (!normalizedStudentId) {
+      return res.status(400).json({ message: 'studentId is required' });
+    }
+
+    const requestRecord = await Request.findOne({ studentIdentifier: normalizedStudentId }).sort({ createdAt: -1 }).lean();
+    if (!requestRecord) {
+      return res.status(404).json({ message: 'No locker data found for this student' });
+    }
+
+    const requestCertId = requestRecord.certId || generateCertId();
+    if (!requestRecord.certId) {
+      await Request.findByIdAndUpdate(requestRecord._id, {
+        $set: {
+          certId: requestCertId,
+          certificateIssuedAt: requestRecord.certificateIssuedAt || new Date()
+        }
+      });
+    }
+
+    const lockerFileName = `locker-${normalizedStudentId}.zip`;
+    res.setHeader('Content-Type', 'application/zip');
+    res.setHeader('Content-Disposition', `attachment; filename="${lockerFileName}"`);
+
+    const archive = archiver('zip', { zlib: { level: 9 } });
+    archive.on('error', (error) => {
+      throw error;
+    });
+    archive.pipe(res);
+
+    const studentLockerDir = path.join(__dirname, 'locker', normalizedStudentId);
+    const fsCertificatePath = path.join(studentLockerDir, 'Certificate.pdf');
+    const fsReceiptsDir = path.join(studentLockerDir, 'Receipts');
+    const fsDocumentsDir = path.join(studentLockerDir, 'Documents');
+
+    if (fs.existsSync(fsCertificatePath)) {
+      archive.file(fsCertificatePath, { name: 'Certificate.pdf' });
+    } else if (requestRecord.finalStatus === 'approved') {
+      const dueRecords = await Due.find({ studentId: normalizedStudentId }).lean();
+      const verifyURL = `${BASE_URL}/verify/${requestCertId}`;
+      const pdf = await buildNoDuesCertificatePdf({
+        request: requestRecord,
+        dueRecords: dueRecords.length > 0 ? dueRecords : memoryDues.filter((due) => due.studentId === normalizedStudentId),
+        verificationUrl: verifyURL,
+        certId: requestCertId
+      });
+      const pdfBufferPromise = streamToBuffer(pdf);
+      pdf.end();
+      const pdfBuffer = await pdfBufferPromise;
+      archive.append(pdfBuffer, { name: 'Certificate.pdf' });
+    }
+
+    if (fs.existsSync(fsReceiptsDir)) {
+      archive.directory(fsReceiptsDir, 'Receipts');
+    } else {
+      const paidDues = await Due.find({ studentId: normalizedStudentId, status: 'paid' }).sort({ paidAt: -1 }).lean();
+      if (paidDues.length > 0) {
+        paidDues.forEach((due, index) => {
+          const receiptContent = [
+            `Receipt #${index + 1}`,
+            `Student ID: ${normalizedStudentId}`,
+            `Department: ${due.department || '-'}`,
+            `Amount: ${Number(due.amount || 0)}`,
+            `Status: ${due.status || 'paid'}`,
+            `Transaction ID: ${due.transactionId || '-'}`,
+            `Razorpay Order ID: ${due.razorpayOrderId || '-'}`,
+            `Razorpay Payment ID: ${due.razorpayPaymentId || '-'}`,
+            `Paid At: ${due.paidAt ? new Date(due.paidAt).toISOString() : '-'}`
+          ].join('\n');
+
+          const receiptName = safeFileName(`${due.department || 'payment'}-receipt-${index + 1}.txt`);
+          archive.append(receiptContent, { name: `Receipts/${receiptName}` });
+        });
+      } else {
+        archive.append('No payment receipts found for this student.', { name: 'Receipts/README.txt' });
+      }
+    }
+
+    if (fs.existsSync(fsDocumentsDir)) {
+      archive.directory(fsDocumentsDir, 'Documents');
+    } else {
+      const documents = requestRecord.documents || {};
+      const documentEntries = [documents.idCard, documents.libraryReceipt, documents.labClearance].filter(Boolean);
+
+      if (documentEntries.length > 0) {
+        documentEntries.forEach((docItem, index) => {
+          const parsed = dataUrlToFile(docItem.dataUrl, docItem.name || `document-${index + 1}`);
+          if (parsed) {
+            archive.append(parsed.buffer, { name: `Documents/${parsed.fileName}` });
+          }
+        });
+      } else {
+        archive.append('No uploaded documents found for this student.', { name: 'Documents/README.txt' });
+      }
+    }
+
+    archive.finalize();
+  } catch (error) {
+    console.error('Failed to generate locker zip:', error);
+    if (!res.headersSent) {
+      res.status(500).json({ message: 'Failed to generate locker ZIP' });
+    }
+  }
+};
+
+app.get('/download-locker/:studentId', downloadLockerHandler);
+app.get('/api/download-locker/:studentId', downloadLockerHandler);
 
 app.get('/verify/:certId', async (req, res) => {
   try {

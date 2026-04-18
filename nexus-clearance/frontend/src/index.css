@@ -101,6 +101,21 @@
   50% { transform: translate3d(0, -18px, 0); }
 }
 
+@keyframes aurora-drift {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(0, -22px, 0) scale(1.04); }
+}
+
+@keyframes sparkle-fade {
+  0%, 100% { opacity: 0.12; transform: translate3d(0, 0, 0); }
+  50% { opacity: 0.26; transform: translate3d(-10px, -12px, 0); }
+}
+
+@keyframes sparkle-drift {
+  0%, 100% { opacity: 0.08; transform: translate3d(0, 0, 0); }
+  50% { opacity: 0.2; transform: translate3d(12px, -10px, 0); }
+}
+
 .tracker-icon-pulse {
   animation: pulse-border 2s infinite;
 }
@@ -121,4 +136,36 @@
 
 .floaty {
   animation: floaty 8s ease-in-out infinite;
+}
+
+.aurora-blob {
+  animation: aurora-drift 14s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.sparkle-layer {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 10% 20%, rgba(244, 244, 255, 0.32) 0 1px, transparent 1.6px),
+    radial-gradient(circle at 80% 30%, rgba(186, 230, 253, 0.26) 0 1px, transparent 1.7px),
+    radial-gradient(circle at 40% 80%, rgba(221, 214, 254, 0.22) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 65% 60%, rgba(224, 231, 255, 0.18) 0 1px, transparent 1.6px);
+  background-size: 260px 260px, 320px 320px, 360px 360px, 300px 300px;
+  opacity: 0.16;
+  animation: sparkle-fade 18s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.sparkle-layer-alt {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 15% 75%, rgba(186, 230, 253, 0.26) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 52% 18%, rgba(233, 213, 255, 0.24) 0 1px, transparent 1.7px),
+    radial-gradient(circle at 92% 68%, rgba(219, 234, 254, 0.2) 0 1px, transparent 1.8px);
+  background-size: 340px 340px, 420px 420px, 380px 380px;
+  opacity: 0.12;
+  animation: sparkle-drift 22s ease-in-out infinite;
+  will-change: transform, opacity;
 }

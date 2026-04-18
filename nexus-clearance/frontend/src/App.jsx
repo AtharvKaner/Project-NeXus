@@ -34,9 +34,11 @@ function App() {
     <Router>
       <div className="relative min-h-screen overflow-hidden flex flex-col text-slate-100">
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="floaty absolute -top-24 left-[-6rem] h-72 w-72 rounded-full bg-violet-500/25 blur-3xl" />
-          <div className="floaty absolute top-24 right-[-5rem] h-80 w-80 rounded-full bg-cyan-500/20 blur-3xl [animation-delay:2s]" />
-          <div className="floaty absolute bottom-[-4rem] left-1/3 h-72 w-72 rounded-full bg-blue-500/20 blur-3xl [animation-delay:4s]" />
+          <div className="aurora-blob absolute -top-28 left-[-7rem] h-80 w-80 rounded-full bg-violet-500/20 blur-3xl" />
+          <div className="aurora-blob absolute top-20 right-[-6rem] h-96 w-96 rounded-full bg-indigo-500/16 blur-3xl [animation-delay:2s]" />
+          <div className="aurora-blob absolute bottom-[-5rem] left-1/3 h-80 w-80 rounded-full bg-cyan-500/16 blur-3xl [animation-delay:4s]" />
+          <div className="sparkle-layer" />
+          <div className="sparkle-layer-alt" />
         </div>
 
         <motion.nav
