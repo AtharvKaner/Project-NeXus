@@ -14,8 +14,9 @@ function App() {
     const token = localStorage.getItem('token');
     const role = localStorage.getItem('role');
     const username = localStorage.getItem('username');
-    if (token && role && username) {
-      setUser({ token, role, username });
+    const identifier = localStorage.getItem('identifier');
+    if (token && role && username && identifier) {
+      setUser({ token, role, username, identifier });
     }
   }, []);
 
@@ -23,6 +24,7 @@ function App() {
     localStorage.removeItem('token');
     localStorage.removeItem('role');
     localStorage.removeItem('username');
+    localStorage.removeItem('identifier');
     setUser(null);
   };
 

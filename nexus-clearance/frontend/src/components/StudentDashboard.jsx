@@ -11,6 +11,8 @@ function StudentDashboard({ user }) {
   const [error, setError] = useState('');
   const [viewCert, setViewCert] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [dues, setDues] = useState([]);
+  const [hasUnpaidDues, setHasUnpaidDues] = useState(false);
 
   // Document upload states
   const [documents, setDocuments] = useState({
@@ -27,7 +29,21 @@ function StudentDashboard({ user }) {
 
   useEffect(() => {
     fetchRequest();
+    fetchDues();
   }, [user]);
+
+  const fetchDues = async () => {
+    try {
+      const res = await fetch(`${API_URL}/api/dues/${user.identifier}`, {
+        headers: { 'Authorization': `Bearer ${user.token}` }
+      });
+      const data = await res.json();
+      setDues(data);
+      setHasUnpaidDues(data.some(d => d.status === 'unpaid'));
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const fetchRequest = async () => {
     try {
@@ -82,7 +98,7 @@ function StudentDashboard({ user }) {
     setDocErrors(prev => ({ ...prev, [docType]: '' }));
   };
 
-  const isFormComplete = documents.idCard && documents.libraryReceipt && documents.labClearance;
+  const isFormComplete = documents.idCard && documents.libraryReceipt && documents.labClearance && !hasUnpaidDues;
 
   const handleSubmitRequest = async () => {
     if (!isFormComplete) return;
@@ -188,6 +204,46 @@ function StudentDashboard({ user }) {
             </div>
           )}
 
+          {/* Dues Section */}
+          <div className="mb-8">
+            <h3 className="text-xl font-bold text-slate-800 mb-4">Pending Institutional Dues</h3>
+            {dues.length === 0 ? (
+               <div className="bg-green-50 text-green-700 p-4 rounded-xl text-sm border border-green-200 flex items-center gap-3">
+                 <CheckCircle size={20} className="shrink-0" />
+                 <p className="font-semibold">No pending dues found. You are cleared financially.</p>
+               </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {dues.map((d, idx) => (
+                    <div key={idx} className={`p-4 rounded-xl border ${d.status === 'unpaid' ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200'}`}>
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <p className="font-bold text-slate-800 capitalize">{d.department}</p>
+                          <p className="text-xs text-slate-500">{d.reason || 'No reason provided'}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className={`font-bold text-lg ${d.status === 'unpaid' ? 'text-red-600' : 'text-green-600'}`}>₹{d.amount}</p>
+                          <p className={`text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded inline-block ${d.status === 'unpaid' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>{d.status}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {hasUnpaidDues && (
+                  <div className="bg-red-100 text-red-800 p-3 rounded-lg text-sm font-semibold flex items-center justify-center gap-2">
+                    <AlertCircle size={18} /> Clearance blocked due to pending unpaid dues.
+                  </div>
+                )}
+                {!hasUnpaidDues && dues.length > 0 && (
+                   <div className="bg-green-50 text-green-700 p-3 rounded-lg text-sm border border-green-200 flex items-center justify-center gap-2 font-semibold">
+                     <CheckCircle size={18} /> All listed dues have been paid.
+                   </div>
+                )}
+              </div>
+            )}
+          </div>
+
           {!request ? (
             /* EMPTY STATE: ONBOARDING / UPLOAD */
             <div className="max-w-3xl mx-auto">
@@ -206,15 +262,15 @@ function StudentDashboard({ user }) {
 
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-slate-50 rounded-xl border border-slate-200">
                 <div className="text-sm text-slate-600">
-                  <span className="font-semibold text-slate-800">Status:</span> {isFormComplete ? <span className="text-green-600 font-medium">Ready for Review</span> : 'Waiting for documents...'}
+                  <span className="font-semibold text-slate-800">Status:</span> {isFormComplete ? <span className="text-green-600 font-medium">Ready for Review</span> : hasUnpaidDues ? <span className="text-red-600 font-medium">Blocked by Unpaid Dues</span> : 'Waiting for documents...'}
                 </div>
                 <button 
-                  className={`btn py-2.5 px-6 ${isFormComplete ? 'btn-primary' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}`} 
+                  className={`btn py-2.5 px-6 rounded-xl font-semibold transition-all ${isFormComplete ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-sm' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}`} 
                   onClick={handleSubmitRequest}
-                  disabled={!isFormComplete || isSubmitting}
+                  disabled={!isFormComplete || isSubmitting || hasUnpaidDues}
                 >
                   {isSubmitting ? 'Submitting...' : 'Submit Application'}
-                  {!isSubmitting && <ArrowRight size={18} />}
+                  {!isSubmitting && <ArrowRight size={18} className="inline ml-2" />}
                 </button>
               </div>
             </div>

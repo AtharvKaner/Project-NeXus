@@ -7,6 +7,7 @@ const statusSchema = new mongoose.Schema({
 
 const requestSchema = new mongoose.Schema({
   studentId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  studentIdentifier: { type: String, required: true },
   studentName: { type: String, required: true },
   status: {
     lab: { type: statusSchema, default: () => ({}) },

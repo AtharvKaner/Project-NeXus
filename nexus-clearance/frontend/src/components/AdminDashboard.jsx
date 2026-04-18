@@ -14,6 +14,8 @@ function AdminDashboard({ user }) {
 
   const [previewDoc, setPreviewDoc] = useState(null);
 
+  const [isUploading, setIsUploading] = useState(false);
+
   const fetchRequests = async () => {
     try {
       const res = await fetch(`${API_URL}/api/requests`, {
@@ -64,6 +66,39 @@ function AdminDashboard({ user }) {
     }
   };
 
+  const handleCsvUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      try {
+        const res = await fetch(`${API_URL}/api/admin/upload-dues`, {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${user.token}`
+          },
+          body: JSON.stringify({ csvData: event.target.result })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          alert(data.message);
+          fetchRequests();
+        } else {
+          alert(data.message || 'Failed to upload CSV');
+        }
+      } catch (err) {
+        alert('Upload failed due to network error');
+      } finally {
+        setIsUploading(false);
+        e.target.value = ''; // Reset input
+      }
+    };
+    reader.readAsText(file);
+  };
+
   const isCurrentStage = (req) => {
     if (req.finalStatus === 'rejected') return false;
 
@@ -103,6 +138,21 @@ function AdminDashboard({ user }) {
         </div>
         <div className="flex items-center gap-3">
           <div className="relative">
+            <input 
+              type="file" 
+              accept=".csv"
+              id="csv-upload"
+              className="hidden"
+              onChange={handleCsvUpload}
+            />
+            <label 
+              htmlFor="csv-upload" 
+              className={`px-4 py-2 text-sm font-semibold rounded-lg cursor-pointer transition-colors shadow-sm inline-block ${isUploading ? 'bg-slate-300 text-slate-500' : 'bg-slate-800 text-white hover:bg-slate-900'}`}
+            >
+              {isUploading ? 'Uploading...' : 'Upload Dues (CSV)'}
+            </label>
+          </div>
+          <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
             <input type="text" placeholder="Search ID..." className="pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-full md:w-64" disabled />
           </div>
@@ -140,6 +190,11 @@ function AdminDashboard({ user }) {
                     <div className="flex items-center gap-3">
                       <p className="font-bold text-slate-800 text-lg">{req.studentName}</p>
                       <span className="px-2 py-0.5 bg-slate-100 text-slate-500 text-xs font-mono rounded">#{req.studentId.substring(0,8)}</span>
+                      {req.hasDues && (
+                        <span className="px-2 py-0.5 bg-red-100 text-red-700 font-bold uppercase tracking-wider text-[10px] rounded border border-red-200">
+                          Clearance Blocked (Pending Dues)
+                        </span>
+                      )}
                     </div>
                     <p className="text-sm text-slate-500 mt-1">Submitted on {new Date(req.createdAt).toLocaleDateString()}</p>
                   </div>
@@ -150,8 +205,10 @@ function AdminDashboard({ user }) {
                     ) : (
                       <>
                         <button 
-                          className="px-4 py-2 text-sm font-semibold text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors shadow-sm"
-                          onClick={() => { setReviewingId(req.id); setReviewType('approved'); setReviewComment(''); }}
+                          className={`px-4 py-2 text-sm font-semibold text-white rounded-lg transition-colors shadow-sm ${req.hasDues ? 'bg-slate-300 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'}`}
+                          onClick={() => { if(!req.hasDues) { setReviewingId(req.id); setReviewType('approved'); setReviewComment(''); } }}
+                          disabled={req.hasDues}
+                          title={req.hasDues ? "Cannot approve while student has pending dues" : ""}
                         >
                           Approve
                         </button>

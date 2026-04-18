@@ -9,21 +9,21 @@ function Login({ setUser }) {
   const queryParams = new URLSearchParams(location.search);
   const loginType = queryParams.get('type') || 'student';
 
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
     setLoading(true);
+    setError('');
 
     try {
       const res = await fetch(`${API_URL}/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.toLowerCase(), password, loginType })
+        body: JSON.stringify({ identifier: identifier.toLowerCase().trim(), password, loginType })
       });
 
       const data = await res.json();
@@ -32,7 +32,8 @@ function Login({ setUser }) {
         localStorage.setItem('token', data.token);
         localStorage.setItem('role', data.role);
         localStorage.setItem('username', data.name);
-        setUser({ token: data.token, role: data.role, username: data.name });
+        localStorage.setItem('identifier', data.identifier);
+        setUser({ token: data.token, role: data.role, username: data.name, identifier: data.identifier });
       } else {
         setError(data.message || 'Login failed');
       }
@@ -66,15 +67,17 @@ function Login({ setUser }) {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1.5">Email Address</label>
+          <div className="mb-4">
+            <label htmlFor="identifier" className="block text-sm font-medium text-slate-700 mb-1.5">
+              {loginType === 'student' ? 'Student ID' : 'Admin ID / Email'}
+            </label>
             <input 
-              type="email" 
-              id="email" 
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" 
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="text" 
+              id="identifier" 
+              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50 transition-all" 
+              placeholder={loginType === 'student' ? 'e.g. 101' : 'admin@test.com'}
+              value={identifier}
+              onChange={(e) => setIdentifier(e.target.value)}
               required
             />
           </div>

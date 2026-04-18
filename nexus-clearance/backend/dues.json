@@ -1,0 +1,474 @@
+[
+  {
+    "studentId": "101",
+    "name": "Atharv",
+    "department": "library",
+    "amount": "500",
+    "status": "unpaid",
+    "reason": "2 books not returned"
+  },
+  {
+    "studentId": "101",
+    "name": "Atharv",
+    "department": "hostel",
+    "amount": "1000",
+    "status": "unpaid",
+    "reason": "room damage"
+  },
+  {
+    "studentId": "",
+    "name": "",
+    "department": "",
+    "amount": "",
+    "status": "",
+    "reason": ""
+  },
+  {
+    "studentId": "102",
+    "name": "Rahul",
+    "department": "library",
+    "amount": "0",
+    "status": "paid",
+    "reason": "-"
+  },
+  {
+    "studentId": "102",
+    "name": "Rahul",
+    "department": "lab",
+    "amount": "200",
+    "status": "unpaid",
+    "reason": "equipment late return"
+  },
+  {
+    "studentId": "",
+    "name": "",
+    "department": "",
+    "amount": "",
+    "status": "",
+    "reason": ""
+  },
+  {
+    "studentId": "103",
+    "name": "Neha",
+    "department": "library",
+    "amount": "200",
+    "status": "unpaid",
+    "reason": "late fine"
+  },
+  {
+    "studentId": "103",
+    "name": "Neha",
+    "department": "hostel",
+    "amount": "0",
+    "status": "paid",
+    "reason": "-"
+  },
+  {
+    "studentId": "",
+    "name": "",
+    "department": "",
+    "amount": "",
+    "status": "",
+    "reason": ""
+  },
+  {
+    "studentId": "104",
+    "name": "Amit",
+    "department": "lab",
+    "amount": "0",
+    "status": "paid",
+    "reason": "-"
+  },
+  {
+    "studentId": "104",
+    "name": "Amit",
+    "department": "library",
+    "amount": "300",
+    "status": "unpaid",
+    "reason": "book lost"
+  },
+  {
+    "studentId": "",
+    "name": "",
+    "department": "",
+    "amount": "",
+    "status": "",
+    "reason": ""
+  },
+  {
+    "studentId": "105",
+    "name": "Priya",
+    "department": "hostel",
+    "amount": "1500",
+    "status": "unpaid",
+    "reason": "maintenance charge"
+  },
+  {
+    "studentId": "105",
+    "name": "Priya",
+    "department": "library",
+    "amount": "0",
+    "status": "paid",
+    "reason": "-"
+  },
+  {
+    "studentId": "",
+    "name": "",
+    "department": "",
+    "amount": "",
+    "status": "",
+    "reason": ""
+  },
+  {
+    "studentId": "106",
+    "name": "Karan",
+    "department": "library",
+    "amount": "0",
+    "status": "paid",
+    "reason": "-"
+  },
+  {
+    "studentId": "106",
+    "name": "Karan",
+    "department": "lab",
+    "amount": "0",
+    "status": "paid",
+    "reason": "-"
+  },
+  {
+    "studentId": "",
+    "name": "",
+    "department": "",
+    "amount": "",
+    "status": "",
+    "reason": ""
+  },
+  {
+    "studentId": "107",
+    "name": "Sneha",
+    "department": "library",
+    "amount": "400",
+    "status": "unpaid",
+    "reason": "book damage"
+  },
+  {
+    "studentId": "107",
+    "name": "Sneha",
+    "department": "hostel",
+    "amount": "0",
+    "status": "paid",
+    "reason": "-"
+  },
+  {
+    "studentId": "",
+    "name": "",
+    "department": "",
+    "amount": "",
+    "status": "",
+    "reason": ""
+  },
+  {
+    "studentId": "108",
+    "name": "Arjun",
+    "department": "lab",
+    "amount": "250",
+    "status": "unpaid",
+    "reason": "equipment damage"
+  },
+  {
+    "studentId": "108",
+    "name": "Arjun",
+    "department": "library",
+    "amount": "0",
+    "status": "paid",
+    "reason": "-"
+  },
+  {
+    "studentId": "",
+    "name": "",
+    "department": "",
+    "amount": "",
+    "status": "",
+    "reason": ""
+  },
+  {
+    "studentId": "109",
+    "name": "Ritika",
+    "department": "hostel",
+    "amount": "0",
+    "status": "paid",
+    "reason": "-"
+  },
+  {
+    "studentId": "109",
+    "name": "Ritika",
+    "department": "library",
+    "amount": "150",
+    "status": "unpaid",
+    "reason": "late return"
+  },
+  {
+    "studentId": "",
+    "name": "",
+    "department": "",
+    "amount": "",
+    "status": "",
+    "reason": ""
+  },
+  {
+    "studentId": "110",
+    "name": "Manav",
+    "department": "library",
+    "amount": "0",
+    "status": "paid",
+    "reason": "-"
+  },
+  {
+    "studentId": "110",
+    "name": "Manav",
+    "department": "lab",
+    "amount": "0",
+    "status": "paid",
+    "reason": "-"
+  },
+  {
+    "studentId": "",
+    "name": "",
+    "department": "",
+    "amount": "",
+    "status": "",
+    "reason": ""
+  },
+  {
+    "studentId": "111",
+    "name": "Anjali",
+    "department": "library",
+    "amount": "350",
+    "status": "unpaid",
+    "reason": "book missing"
+  },
+  {
+    "studentId": "111",
+    "name": "Anjali",
+    "department": "hostel",
+    "amount": "0",
+    "status": "paid",
+    "reason": "-"
+  },
+  {
+    "studentId": "",
+    "name": "",
+    "department": "",
+    "amount": "",
+    "status": "",
+    "reason": ""
+  },
+  {
+    "studentId": "112",
+    "name": "Rohan",
+    "department": "lab",
+    "amount": "0",
+    "status": "paid",
+    "reason": "-"
+  },
+  {
+    "studentId": "112",
+    "name": "Rohan",
+    "department": "library",
+    "amount": "100",
+    "status": "unpaid",
+    "reason": "fine"
+  },
+  {
+    "studentId": "",
+    "name": "",
+    "department": "",
+    "amount": "",
+    "status": "",
+    "reason": ""
+  },
+  {
+    "studentId": "113",
+    "name": "Kavya",
+    "department": "hostel",
+    "amount": "1200",
+    "status": "unpaid",
+    "reason": "room repair"
+  },
+  {
+    "studentId": "113",
+    "name": "Kavya",
+    "department": "library",
+    "amount": "0",
+    "status": "paid",
+    "reason": "-"
+  },
+  {
+    "studentId": "",
+    "name": "",
+    "department": "",
+    "amount": "",
+    "status": "",
+    "reason": ""
+  },
+  {
+    "studentId": "114",
+    "name": "Varun",
+    "department": "library",
+    "amount": "0",
+    "status": "paid",
+    "reason": "-"
+  },
+  {
+    "studentId": "114",
+    "name": "Varun",
+    "department": "lab",
+    "amount": "0",
+    "status": "paid",
+    "reason": "-"
+  },
+  {
+    "studentId": "",
+    "name": "",
+    "department": "",
+    "amount": "",
+    "status": "",
+    "reason": ""
+  },
+  {
+    "studentId": "115",
+    "name": "Meera",
+    "department": "library",
+    "amount": "200",
+    "status": "unpaid",
+    "reason": "late fine"
+  },
+  {
+    "studentId": "115",
+    "name": "Meera",
+    "department": "hostel",
+    "amount": "500",
+    "status": "unpaid",
+    "reason": "cleaning charges"
+  },
+  {
+    "studentId": "",
+    "name": "",
+    "department": "",
+    "amount": "",
+    "status": "",
+    "reason": ""
+  },
+  {
+    "studentId": "116",
+    "name": "Sahil",
+    "department": "lab",
+    "amount": "0",
+    "status": "paid",
+    "reason": "-"
+  },
+  {
+    "studentId": "116",
+    "name": "Sahil",
+    "department": "library",
+    "amount": "0",
+    "status": "paid",
+    "reason": "-"
+  },
+  {
+    "studentId": "",
+    "name": "",
+    "department": "",
+    "amount": "",
+    "status": "",
+    "reason": ""
+  },
+  {
+    "studentId": "117",
+    "name": "Divya",
+    "department": "library",
+    "amount": "450",
+    "status": "unpaid",
+    "reason": "book damage"
+  },
+  {
+    "studentId": "117",
+    "name": "Divya",
+    "department": "hostel",
+    "amount": "0",
+    "status": "paid",
+    "reason": "-"
+  },
+  {
+    "studentId": "",
+    "name": "",
+    "department": "",
+    "amount": "",
+    "status": "",
+    "reason": ""
+  },
+  {
+    "studentId": "118",
+    "name": "Yash",
+    "department": "lab",
+    "amount": "300",
+    "status": "unpaid",
+    "reason": "equipment fine"
+  },
+  {
+    "studentId": "118",
+    "name": "Yash",
+    "department": "library",
+    "amount": "0",
+    "status": "paid",
+    "reason": "-"
+  },
+  {
+    "studentId": "",
+    "name": "",
+    "department": "",
+    "amount": "",
+    "status": "",
+    "reason": ""
+  },
+  {
+    "studentId": "119",
+    "name": "Tanvi",
+    "department": "hostel",
+    "amount": "0",
+    "status": "paid",
+    "reason": "-"
+  },
+  {
+    "studentId": "119",
+    "name": "Tanvi",
+    "department": "library",
+    "amount": "250",
+    "status": "unpaid",
+    "reason": "late submission"
+  },
+  {
+    "studentId": "",
+    "name": "",
+    "department": "",
+    "amount": "",
+    "status": "",
+    "reason": ""
+  },
+  {
+    "studentId": "120",
+    "name": "Aryan",
+    "department": "library",
+    "amount": "0",
+    "status": "paid",
+    "reason": "-"
+  },
+  {
+    "studentId": "120",
+    "name": "Aryan",
+    "department": "lab",
+    "amount": "0",
+    "status": "paid",
+    "reason": "-"
+  }
+]
