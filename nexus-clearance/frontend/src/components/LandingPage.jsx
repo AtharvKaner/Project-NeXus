@@ -1,53 +1,89 @@
 import { Link } from 'react-router-dom';
-import { User, Shield, ArrowRight } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { User, Shield, ArrowRight, Sparkles, ShieldCheck, Layers3 } from 'lucide-react';
 
 function LandingPage() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] text-center animate-[fade-in_0.5s_ease]">
-      <div className="bg-blue-50 text-blue-600 px-4 py-1.5 rounded-full text-sm font-semibold tracking-wide uppercase mb-6 inline-block">
+    <motion.div
+      initial={{ opacity: 0, y: 24 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.55, ease: 'easeOut' }}
+      className="relative flex min-h-[72vh] flex-col items-center justify-center text-center"
+    >
+      <div className="absolute inset-0 -z-10 overflow-hidden">
+        <div className="floaty absolute left-10 top-10 h-56 w-56 rounded-full bg-violet-500/15 blur-3xl" />
+        <div className="floaty absolute right-10 top-1/3 h-72 w-72 rounded-full bg-cyan-500/15 blur-3xl [animation-delay:2s]" />
+      </div>
+
+      <div className="glass-panel neon-border mx-auto mb-6 inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold uppercase tracking-[0.25em] text-cyan-200">
+        <Sparkles size={14} />
         Project Nexus
       </div>
-      
-      <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-slate-800 tracking-tight mb-6 max-w-3xl leading-tight">
-        Streamlined Institutional <span className="text-blue-600">Clearance System</span>
+
+      <h1 className="max-w-4xl text-4xl font-black tracking-tight text-white sm:text-5xl md:text-7xl">
+        Streamlined Institutional <span className="bg-gradient-to-r from-cyan-300 via-violet-300 to-fuchsia-300 bg-clip-text text-transparent">Clearance</span>
       </h1>
-      
-      <p className="text-lg sm:text-xl text-slate-500 mb-12 max-w-2xl">
-        A modern, multi-stage approval workflow designed for educational institutions to automate and manage student clearances efficiently.
+
+      <p className="mt-6 max-w-3xl text-base leading-8 text-slate-300 sm:text-lg md:text-xl">
+        A premium, multi-stage approval workflow designed for educational institutions to automate clearance, dues, and certification with confidence.
       </p>
-      
-      <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md mx-auto">
-        <Link 
-          to="/login?type=student" 
-          className="flex-1 bg-white hover:bg-slate-50 text-slate-800 border-2 border-slate-200 hover:border-blue-500 font-semibold py-4 px-6 rounded-xl flex items-center justify-center gap-3 transition-all group shadow-sm hover:shadow-md"
-        >
-          <div className="w-10 h-10 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-            <User size={20} />
-          </div>
-          <div className="text-left">
-            <div className="text-sm text-slate-500 font-normal">I am a</div>
-            <div className="text-lg">Student</div>
-          </div>
-        </Link>
-        
-        <Link 
-          to="/login?type=admin" 
-          className="flex-1 bg-slate-800 hover:bg-slate-900 text-white border-2 border-slate-800 font-semibold py-4 px-6 rounded-xl flex items-center justify-center gap-3 transition-all group shadow-sm hover:shadow-md"
-        >
-          <div className="w-10 h-10 bg-slate-700 text-slate-200 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-            <Shield size={20} />
-          </div>
-          <div className="text-left">
-            <div className="text-sm text-slate-400 font-normal">I am an</div>
-            <div className="text-lg">Admin</div>
-          </div>
-        </Link>
+
+      <div className="mt-10 grid w-full max-w-5xl gap-4 sm:grid-cols-2">
+        <motion.div whileHover={{ y: -6, scale: 1.01 }} transition={{ duration: 0.3 }}>
+          <Link
+            to="/login?type=student"
+            className="glass-card group flex h-full items-center gap-4 p-5 text-left text-white neon-border hover:bg-white/12"
+          >
+            <div className="rounded-2xl bg-cyan-500/15 p-4 text-cyan-300 shadow-lg shadow-cyan-950/20 transition-transform duration-300 group-hover:scale-110">
+              <User size={24} />
+            </div>
+            <div className="flex-1">
+              <div className="text-sm uppercase tracking-[0.2em] text-slate-400">Student Portal</div>
+              <div className="mt-1 text-2xl font-bold">Access your dues and certificate</div>
+            </div>
+            <ArrowRight className="text-cyan-300" size={18} />
+          </Link>
+        </motion.div>
+
+        <motion.div whileHover={{ y: -6, scale: 1.01 }} transition={{ duration: 0.3 }}>
+          <Link
+            to="/login?type=admin"
+            className="glass-card group flex h-full items-center gap-4 p-5 text-left text-white neon-border hover:bg-white/12"
+          >
+            <div className="rounded-2xl bg-violet-500/15 p-4 text-violet-300 shadow-lg shadow-violet-950/20 transition-transform duration-300 group-hover:scale-110">
+              <Shield size={24} />
+            </div>
+            <div className="flex-1">
+              <div className="text-sm uppercase tracking-[0.2em] text-slate-400">Admin Portal</div>
+              <div className="mt-1 text-2xl font-bold">Review, approve, and manage</div>
+            </div>
+            <ArrowRight className="text-violet-300" size={18} />
+          </Link>
+        </motion.div>
       </div>
-      
-      <div className="mt-12 text-sm text-slate-500">
-        New here? <Link to="/signup" className="text-blue-600 font-medium hover:underline">Create an account</Link>
+
+      <div className="mt-10 grid w-full max-w-4xl gap-4 sm:grid-cols-3">
+        {[
+          { icon: Layers3, label: 'Workflow', value: 'Multi-stage' },
+          { icon: ShieldCheck, label: 'Security', value: 'Verified QR' },
+          { icon: Sparkles, label: 'Experience', value: 'Premium UI' },
+        ].map((item) => (
+          <div key={item.label} className="glass-card flex items-center gap-4 p-4 text-left text-white">
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-3 text-cyan-300">
+              <item.icon size={20} />
+            </div>
+            <div>
+              <div className="text-xs uppercase tracking-[0.2em] text-slate-400">{item.label}</div>
+              <div className="text-lg font-semibold">{item.value}</div>
+            </div>
+          </div>
+        ))}
       </div>
-    </div>
+
+      <div className="mt-10 text-sm text-slate-400">
+        New here? <Link to="/signup" className="font-semibold text-cyan-300 hover:text-cyan-200">Create an account</Link>
+      </div>
+    </motion.div>
   );
 }
 

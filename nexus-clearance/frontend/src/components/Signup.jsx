@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { UserPlus, ArrowLeft } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { UserPlus, ArrowLeft, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const API_URL = 'http://localhost:3000';
@@ -43,33 +44,41 @@ function Signup({ setUser }) {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto my-auto animate-[fade-in_0.5s_ease]">
-      <Link to="/" className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-blue-600 mb-6 transition-colors">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.45 }}
+      className="mx-auto my-auto w-full max-w-md"
+    >
+      <Link to="/" className="mb-6 inline-flex items-center gap-2 text-sm text-slate-300 transition-colors hover:text-cyan-200">
         <ArrowLeft size={16} /> Back to Home
       </Link>
       
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 sm:p-10">
-        <div className="flex flex-col items-center mb-8">
-          <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-4">
+      <div className="glass-panel neon-border p-8 sm:p-10">
+        <div className="mb-8 flex flex-col items-center">
+          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500/20 to-cyan-500/20 text-violet-200 shadow-lg shadow-violet-950/20">
             <UserPlus size={32} />
           </div>
-          <h2 className="text-2xl font-bold text-slate-800 tracking-tight">Create Account</h2>
-          <p className="text-slate-500 text-sm mt-1">Join Project Nexus</p>
+          <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.28em] text-slate-300">
+            <Sparkles size={12} /> Join the Network
+          </div>
+          <h2 className="text-3xl font-black tracking-tight text-white">Create Account</h2>
+          <p className="mt-2 text-sm text-slate-300">Join Project Nexus</p>
         </div>
         
         {error && (
-          <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-6 text-sm border border-red-100 flex items-center gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-red-600"></div>
+          <div className="mb-6 flex items-center gap-2 rounded-2xl border border-rose-400/20 bg-rose-500/10 p-3 text-sm text-rose-200">
+            <div className="h-1.5 w-1.5 rounded-full bg-rose-400"></div>
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Full Name</label>
+            <label className="mb-1.5 block text-sm font-medium text-slate-200">Full Name</label>
             <input 
               type="text" 
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" 
+              className="glass-input" 
               placeholder="e.g. Jane Doe"
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -78,13 +87,13 @@ function Signup({ setUser }) {
           </div>
 
           <div>
-            <label htmlFor="identifier" className="block text-sm font-medium text-slate-700 mb-1.5">
+            <label htmlFor="identifier" className="mb-1.5 block text-sm font-medium text-slate-200">
               {role === 'student' ? 'Student ID' : 'Admin ID / Email'}
             </label>
             <input 
               type="text" 
               id="identifier" 
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" 
+              className="glass-input" 
               placeholder={role === 'student' ? 'e.g. 101' : 'admin@university.edu'}
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
@@ -93,10 +102,10 @@ function Signup({ setUser }) {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Password</label>
+            <label className="mb-1.5 block text-sm font-medium text-slate-200">Password</label>
             <input 
               type="password" 
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" 
+              className="glass-input" 
               placeholder="Create a password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -105,9 +114,9 @@ function Signup({ setUser }) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Role</label>
+            <label className="mb-1.5 block text-sm font-medium text-slate-200">Role</label>
             <select 
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+              className="glass-input"
               value={role}
               onChange={(e) => setRole(e.target.value)}
             >
@@ -118,20 +127,22 @@ function Signup({ setUser }) {
             </select>
           </div>
 
-          <button 
+          <motion.button 
             type="submit" 
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-xl flex items-center justify-center gap-2 transition-colors duration-200 shadow-sm mt-4"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="glow-button mt-4 w-full"
             disabled={loading}
           >
             {loading ? 'Creating Account...' : 'Sign Up'}
-          </button>
+          </motion.button>
         </form>
         
-        <div className="mt-6 text-center text-sm text-slate-500">
-          Already have an account? <Link to="/login" className="text-blue-600 font-medium hover:underline">Log in</Link>
+        <div className="mt-6 text-center text-sm text-slate-300">
+          Already have an account? <Link to="/login" className="font-medium text-cyan-300 hover:text-cyan-200">Log in</Link>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 

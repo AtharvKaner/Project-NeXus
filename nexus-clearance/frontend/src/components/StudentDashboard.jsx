@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import StatusTracker from './StatusTracker';
 import Certificate from './Certificate';
 import { UploadCloud, FileText, CheckCircle, AlertCircle, Eye, ArrowRight, Image as ImageIcon, X } from 'lucide-react';
@@ -288,10 +289,10 @@ function StudentDashboard({ user }) {
   };
 
   const DocumentCard = ({ title, type, doc, error }) => (
-    <div className={`p-4 rounded-xl border-2 transition-all ${doc ? 'border-green-200 bg-green-50/30' : error ? 'border-red-300 bg-red-50/50' : 'border-dashed border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-slate-300'}`}>
+    <div className={`glass-card p-4 transition-all ${doc ? 'border-emerald-400/20 bg-emerald-500/10' : error ? 'border-rose-400/20 bg-rose-500/10' : 'border-dashed border-white/10 bg-white/5 hover:bg-white/10 hover:border-cyan-400/20'}`}>
       <div className="flex justify-between items-start mb-2">
-        <h4 className="font-semibold text-slate-800 text-sm">{title}</h4>
-        {doc && <CheckCircle size={16} className="text-green-500" />}
+        <h4 className="font-semibold text-white text-sm">{title}</h4>
+        {doc && <CheckCircle size={16} className="text-emerald-300" />}
       </div>
       
       {!doc ? (
@@ -303,75 +304,85 @@ function StudentDashboard({ user }) {
             onChange={(e) => handleFileUpload(type, e.target.files[0])}
             title={`Upload ${title}`}
           />
-          <div className="flex flex-col items-center justify-center py-4 text-slate-400">
-            <UploadCloud size={24} className="mb-2" />
+          <div className="flex flex-col items-center justify-center py-4 text-slate-300">
+            <UploadCloud size={24} className="mb-2 text-cyan-300" />
             <span className="text-xs font-medium">Click or drag to upload</span>
           </div>
         </div>
       ) : (
-        <div className="flex items-center justify-between bg-white p-2 rounded-lg border border-green-100 shadow-sm mt-2">
+        <div className="mt-2 flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 p-2">
           <div className="flex items-center gap-2 overflow-hidden">
-            {doc.fileType && doc.fileType.includes('pdf') ? <FileText size={18} className="text-red-500 shrink-0" /> : <ImageIcon size={18} className="text-blue-500 shrink-0" />}
-            <span className="text-xs font-medium text-slate-700 truncate">{doc.name}</span>
+            {doc.fileType && doc.fileType.includes('pdf') ? <FileText size={18} className="shrink-0 text-rose-300" /> : <ImageIcon size={18} className="shrink-0 text-cyan-300" />}
+            <span className="truncate text-xs font-medium text-slate-100">{doc.name}</span>
           </div>
           <div className="flex items-center gap-1 shrink-0">
-            <button className="p-1 hover:bg-slate-100 rounded text-slate-500" onClick={() => setPreviewDoc(doc)} title="Preview">
+            <button className="rounded p-1 text-slate-300 hover:bg-white/10 hover:text-white" onClick={() => setPreviewDoc(doc)} title="Preview">
               <Eye size={14} />
             </button>
-            <button className="p-1 hover:bg-red-50 rounded text-slate-500 hover:text-red-600" onClick={() => removeDocument(type)} title="Remove">
+            <button className="rounded p-1 text-slate-300 hover:bg-rose-500/10 hover:text-rose-200" onClick={() => removeDocument(type)} title="Remove">
               <X size={14} />
             </button>
           </div>
         </div>
       )}
-      {error && <p className="text-[10px] text-red-600 mt-2 font-medium">{error}</p>}
+      {error && <p className="mt-2 text-[10px] font-medium text-rose-300">{error}</p>}
     </div>
   );
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <div className="glass-panel neon-border flex items-center justify-center px-6 py-16">
+        <div className="flex items-center gap-3 text-slate-200">
+          <div className="h-3 w-3 animate-pulse rounded-full bg-cyan-300"></div>
+          <div className="h-3 w-3 animate-pulse rounded-full bg-violet-300 [animation-delay:150ms]"></div>
+          <div className="h-3 w-3 animate-pulse rounded-full bg-indigo-300 [animation-delay:300ms]"></div>
+          <span className="ml-2 text-sm font-medium text-slate-300">Loading clearance workspace...</span>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="animate-[fade-in_0.5s_ease] w-full max-w-4xl mx-auto">
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+    <motion.div
+      initial={{ opacity: 0, y: 18 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.45, ease: 'easeOut' }}
+      className="w-full max-w-5xl mx-auto"
+    >
+      <div className="glass-panel neon-border overflow-hidden">
         
         {/* Header Area */}
-        <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+        <div className="border-b border-white/10 bg-white/5 px-6 py-5 backdrop-blur-xl flex justify-between items-center">
           <div>
-            <h2 className="text-xl font-bold text-slate-800">Clearance Status</h2>
-            <p className="text-sm text-slate-500 mt-0.5">Track your administrative clearance progress</p>
+            <h2 className="text-xl font-bold text-white">Clearance Status</h2>
+            <p className="text-sm text-slate-300 mt-0.5">Track your administrative clearance progress</p>
           </div>
           {request && (
-            <div className={`px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider ${
-              request.finalStatus === 'approved' ? 'bg-green-100 text-green-700' :
-              request.finalStatus === 'rejected' ? 'bg-red-100 text-red-700' :
-              'bg-amber-100 text-amber-700'
+            <div className={`px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider border ${
+              request.finalStatus === 'approved' ? 'border-emerald-400/20 bg-emerald-500/10 text-emerald-200' :
+              request.finalStatus === 'rejected' ? 'border-rose-400/20 bg-rose-500/10 text-rose-200' :
+              'border-amber-400/20 bg-amber-500/10 text-amber-200'
             }`}>
               {request.finalStatus}
             </div>
           )}
         </div>
 
-        <div className="p-6 md:p-8">
+        <div className="space-y-8 p-6 md:p-8">
           {error && (
-            <div className="bg-red-50 text-red-600 p-4 rounded-xl mb-6 text-sm border border-red-100 flex items-start gap-3">
+            <div className="flex items-start gap-3 rounded-2xl border border-rose-400/20 bg-rose-500/10 p-4 text-sm text-rose-200">
               <AlertCircle size={20} className="shrink-0 mt-0.5" />
               <p>{error}</p>
             </div>
           )}
 
           {paymentMessage && (
-            <div className="bg-green-50 text-green-700 p-4 rounded-xl mb-6 text-sm border border-green-200 flex items-start gap-3">
+            <div className="flex items-start gap-3 rounded-2xl border border-emerald-400/20 bg-emerald-500/10 p-4 text-sm text-emerald-200">
               <CheckCircle size={20} className="shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">{paymentMessage}</p>
                 {paymentReceipt && (
-                  <p className="mt-1 text-xs text-green-700/90">
+                  <p className="mt-1 text-xs text-emerald-100/90">
                     Receipt {paymentReceipt.transactionId} for {paymentReceipt.department} dues of ₹{paymentReceipt.amount}
                     {paymentReceipt.fallbackUsed ? ' (demo fallback used)' : ''}
                   </p>
@@ -382,76 +393,96 @@ function StudentDashboard({ user }) {
 
           {/* Dues Section */}
           <div className="mb-8">
-            <h3 className="text-xl font-bold text-slate-800 mb-4">Pending Institutional Dues</h3>
+            <h3 className="text-xl font-bold text-white mb-4">Pending Institutional Dues</h3>
             {dues.length === 0 ? (
-               <div className="bg-green-50 text-green-700 p-4 rounded-xl text-sm border border-green-200 flex items-center gap-3">
+               <div className="flex items-center gap-3 rounded-2xl border border-emerald-400/20 bg-emerald-500/10 p-4 text-sm text-emerald-200">
                  <CheckCircle size={20} className="shrink-0" />
                  <p className="font-semibold">No pending dues found. You are cleared financially.</p>
                </div>
             ) : (
-              <div className="space-y-4">
-                <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
-                  <div className="grid grid-cols-[1.2fr_0.8fr_0.8fr_auto] gap-4 px-4 py-3 bg-slate-50 text-xs font-semibold uppercase tracking-wider text-slate-500">
-                    <div>Department</div>
-                    <div>Amount</div>
-                    <div>Status</div>
-                    <div className="text-right">Action</div>
-                  </div>
-                  <div className="divide-y divide-slate-100">
-                    {dues.map((d) => {
-                      const key = dueKey(d);
-                      const isProcessing = processingDueKey === key;
+              <>
+                <div className="grid gap-4 lg:grid-cols-2">
+                  {dues.map((d, index) => {
+                    const key = dueKey(d);
+                    const isProcessing = processingDueKey === key;
 
-                      return (
-                        <div key={key} className={`grid grid-cols-1 gap-3 px-4 py-4 md:grid-cols-[1.2fr_0.8fr_0.8fr_auto] md:items-center ${d.status === 'unpaid' ? 'bg-red-50/40' : 'bg-green-50/30'}`}>
-                          <div>
-                            <p className="font-bold text-slate-800 capitalize">{d.department}</p>
-                            <p className="text-xs text-slate-500 mt-1">{d.reason || 'No reason provided'}</p>
-                          </div>
-                          <div className="font-bold text-slate-800">₹{d.amount}</div>
-                          <div>
-                            <span className={`text-[10px] uppercase font-bold tracking-wider px-2 py-1 rounded inline-block ${d.status === 'unpaid' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+                    return (
+                      <motion.div
+                        key={key}
+                        initial={{ opacity: 0, y: 16 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.35, delay: index * 0.05 }}
+                        whileHover={{ y: -6, scale: 1.01 }}
+                        className="glass-card group relative overflow-hidden border border-white/10 p-5"
+                      >
+                        <div className={`absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 ${d.status === 'unpaid' ? 'bg-[radial-gradient(circle_at_top_right,rgba(244,63,94,0.14),transparent_40%)]' : 'bg-[radial-gradient(circle_at_top_right,rgba(34,197,94,0.14),transparent_40%)]'}`} />
+                        <div className="relative z-10">
+                          <div className="mb-5 flex items-start justify-between gap-4">
+                            <div className="flex items-center gap-3">
+                              <div className="rounded-2xl border border-white/10 bg-white/5 p-3 text-cyan-300 shadow-lg shadow-cyan-950/20">
+                                {d.department?.includes('lab') ? <FileText size={20} /> : d.department?.includes('hostel') ? <ImageIcon size={20} /> : <AlertCircle size={20} />}
+                              </div>
+                              <div>
+                                <p className="text-xs uppercase tracking-[0.22em] text-slate-400">Department</p>
+                                <p className="text-xl font-bold capitalize text-white">{d.department}</p>
+                              </div>
+                            </div>
+                            <span className={`rounded-full border px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${d.status === 'unpaid' ? 'border-rose-400/20 bg-rose-500/10 text-rose-200' : 'border-emerald-400/20 bg-emerald-500/10 text-emerald-200'}`}>
                               {d.status}
                             </span>
                           </div>
-                          <div className="md:text-right">
+
+                          <div className="mb-4 rounded-2xl border border-white/10 bg-white/5 p-4">
+                            <div className="text-xs uppercase tracking-[0.24em] text-slate-400">Amount Due</div>
+                            <div className="mt-1 text-3xl font-black text-white">₹{d.amount}</div>
+                            <p className="mt-2 text-sm text-slate-300">{d.reason || 'No reason provided'}</p>
+                          </div>
+
+                          <div className="flex items-center justify-between gap-3">
+                            <div className="text-xs text-slate-400">
+                              {d.status === 'unpaid' ? 'Payment required' : 'Payment received'}
+                            </div>
                             {d.status === 'unpaid' ? (
-                              <button
-                                className="w-full md:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+                              <motion.button
+                                whileHover={{ scale: 1.03 }}
+                                whileTap={{ scale: 0.97 }}
+                                className="glow-button px-4 py-2.5 text-sm"
                                 onClick={() => handlePayNow(d)}
                                 disabled={isProcessing}
                               >
                                 {isProcessing ? 'Processing...' : 'Pay Now'}
-                              </button>
+                              </motion.button>
                             ) : (
-                              <span className="text-xs font-medium text-green-700">Paid</span>
+                              <span className="rounded-full border border-emerald-400/20 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-200">
+                                Paid
+                              </span>
                             )}
                           </div>
                         </div>
-                      );
-                    })}
-                  </div>
+                      </motion.div>
+                    );
+                  })}
                 </div>
                 {hasUnpaidDues && (
-                  <div className="bg-red-100 text-red-800 p-3 rounded-lg text-sm font-semibold flex items-center justify-center gap-2">
+                  <div className="flex items-center justify-center gap-2 rounded-2xl border border-rose-400/20 bg-rose-500/10 p-3 text-sm font-semibold text-rose-200">
                     <AlertCircle size={18} /> Clearance blocked due to pending unpaid dues.
                   </div>
                 )}
                 {!hasUnpaidDues && dues.length > 0 && (
-                   <div className="bg-green-50 text-green-700 p-3 rounded-lg text-sm border border-green-200 flex items-center justify-center gap-2 font-semibold">
-                     <CheckCircle size={18} /> All listed dues have been paid.
-                   </div>
+                  <div className="flex items-center justify-center gap-2 rounded-2xl border border-emerald-400/20 bg-emerald-500/10 p-3 text-sm font-semibold text-emerald-200">
+                    <CheckCircle size={18} /> All listed dues have been paid.
+                  </div>
                 )}
-              </div>
+              </>
             )}
           </div>
 
           {!request ? (
             /* EMPTY STATE: ONBOARDING / UPLOAD */
-            <div className="max-w-3xl mx-auto">
-              <div className="mb-8 border-b border-slate-100 pb-6">
-                <h3 className="text-xl font-bold text-slate-800 mb-2">Document Verification</h3>
-                <p className="text-slate-500 text-sm leading-relaxed">
+            <div className="mx-auto max-w-4xl">
+              <div className="mb-8 border-b border-white/10 pb-6">
+                <h3 className="text-xl font-bold text-white mb-2">Document Verification</h3>
+                <p className="text-sm leading-relaxed text-slate-300">
                   Please upload the required verification documents to initiate your clearance workflow. All documents must be clearly legible. Maximum file size is 2MB (PDF, JPG, PNG).
                 </p>
               </div>
@@ -462,12 +493,12 @@ function StudentDashboard({ user }) {
                 <DocumentCard title="Lab Clearance Form" type="labClearance" doc={documents.labClearance} error={docErrors.labClearance} />
               </div>
 
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-slate-50 rounded-xl border border-slate-200">
-                <div className="text-sm text-slate-600">
-                  <span className="font-semibold text-slate-800">Status:</span> {isFormComplete ? <span className="text-green-600 font-medium">Ready for Review</span> : hasUnpaidDues ? <span className="text-red-600 font-medium">Blocked by Unpaid Dues</span> : 'Waiting for documents...'}
+              <div className="glass-card flex flex-col items-center justify-between gap-4 p-4 sm:flex-row">
+                <div className="text-sm text-slate-300">
+                  <span className="font-semibold text-white">Status:</span> {isFormComplete ? <span className="font-medium text-emerald-300">Ready for Review</span> : hasUnpaidDues ? <span className="font-medium text-rose-300">Blocked by Unpaid Dues</span> : 'Waiting for documents...'}
                 </div>
                 <button 
-                  className={`btn py-2.5 px-6 rounded-xl font-semibold transition-all ${isFormComplete ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-sm' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}`} 
+                  className={`glow-button py-2.5 px-6 ${isFormComplete ? '' : 'cursor-not-allowed opacity-40 grayscale'}`} 
                   onClick={handleSubmitRequest}
                   disabled={!isFormComplete || isSubmitting || hasUnpaidDues}
                 >
@@ -479,20 +510,20 @@ function StudentDashboard({ user }) {
           ) : (
             /* ACTIVE STATE: TRACKER */
             <div>
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-50 rounded-xl p-4 border border-slate-100 mb-10">
+              <div className="glass-card mb-10 flex flex-col justify-between gap-4 p-4 md:flex-row md:items-center">
                 <div>
-                  <p className="text-xs text-slate-500 uppercase font-semibold tracking-wider mb-1">Application ID</p>
-                  <p className="font-mono text-sm font-medium text-slate-800">#{request.id.toString().substring(0,8)}</p>
+                  <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-400">Application ID</p>
+                  <p className="font-mono text-sm font-medium text-white">#{request.id.toString().substring(0,8)}</p>
                 </div>
-                <div className="hidden md:block w-px h-10 bg-slate-200"></div>
+                <div className="hidden h-10 w-px bg-white/10 md:block"></div>
                 <div>
-                  <p className="text-xs text-slate-500 uppercase font-semibold tracking-wider mb-1">Submitted On</p>
-                  <p className="text-sm font-medium text-slate-800">{new Date(request.createdAt).toLocaleDateString()}</p>
+                  <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-400">Submitted On</p>
+                  <p className="text-sm font-medium text-white">{new Date(request.createdAt).toLocaleDateString()}</p>
                 </div>
-                <div className="hidden md:block w-px h-10 bg-slate-200"></div>
+                <div className="hidden h-10 w-px bg-white/10 md:block"></div>
                 <div>
-                  <p className="text-xs text-slate-500 uppercase font-semibold tracking-wider mb-1">Current Stage</p>
-                  <p className="text-sm font-medium text-slate-800 capitalize">
+                  <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-400">Current Stage</p>
+                  <p className="text-sm font-medium text-white capitalize">
                     {request.status.lab.state === 'pending' ? 'Lab Clearance' : 
                      request.status.hod.state === 'pending' ? 'HOD Review' : 
                      request.status.principal.state === 'pending' ? 'Principal Review' : 'Completed'}
@@ -503,32 +534,32 @@ function StudentDashboard({ user }) {
               <StatusTracker status={request.status} />
 
               {request.finalStatus === 'rejected' && (
-                 <div className="mt-12 p-5 bg-red-50 border border-red-200 rounded-xl flex items-start gap-4">
-                   <AlertCircle size={24} className="text-red-600 shrink-0 mt-0.5" />
+                 <div className="mt-12 flex items-start gap-4 rounded-2xl border border-rose-400/20 bg-rose-500/10 p-5">
+                   <AlertCircle size={24} className="mt-0.5 shrink-0 text-rose-300" />
                    <div>
-                     <h4 className="font-bold text-red-800 mb-1">Action Required</h4>
-                     <p className="text-sm text-red-700 leading-relaxed m-0">Your clearance request has been halted. Please resolve the issues noted in the timeline above and contact the respective department administration to proceed.</p>
+                     <h4 className="mb-1 font-bold text-rose-100">Action Required</h4>
+                     <p className="m-0 text-sm leading-relaxed text-rose-200">Your clearance request has been halted. Please resolve the issues noted in the timeline above and contact the respective department administration to proceed.</p>
                    </div>
                  </div>
               )}
               
               {request.finalStatus === 'approved' && (
-                <div className="mt-12 text-center pt-8 border-t border-slate-100">
-                  <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="mt-12 border-t border-white/10 pt-8 text-center">
+                  <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full border border-emerald-400/20 bg-emerald-500/15 text-emerald-300 shadow-[0_0_30px_rgba(34,197,94,0.22)]">
                     <CheckCircle size={32} />
                   </div>
-                  <h3 className="text-xl font-bold text-slate-800 mb-2">No Dues Certificate Ready</h3>
-                  <p className="text-slate-500 text-sm mb-6 max-w-sm mx-auto">Your clearance process is complete. View the certificate or download the official PDF signed by the principal.</p>
+                  <h3 className="mb-2 text-xl font-bold text-white">No Dues Certificate Ready</h3>
+                  <p className="mx-auto mb-6 max-w-sm text-sm text-slate-300">Your clearance process is complete. View the certificate or download the official PDF signed by the principal.</p>
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                     <button 
-                      className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-slate-800 hover:bg-slate-900 text-white rounded-xl font-medium transition-all shadow-sm" 
+                      className="glow-button px-6 py-3" 
                       onClick={() => setViewCert(!viewCert)}
                     >
                       <Eye size={18} />
                       {viewCert ? 'Hide Certificate' : 'View Certificate'}
                     </button>
                     <button
-                      className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-all shadow-sm"
+                      className="glow-button px-6 py-3"
                       onClick={handleDownloadCertificate}
                     >
                       Download PDF
@@ -549,23 +580,23 @@ function StudentDashboard({ user }) {
 
       {/* Document Preview Modal */}
       {previewDoc && (
-        <div className="fixed inset-0 bg-slate-900/60 flex items-center justify-center z-50 p-4" onClick={() => setPreviewDoc(null)}>
-          <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col" onClick={e => e.stopPropagation()}>
-            <div className="flex justify-between items-center p-4 border-b border-slate-100">
-              <h3 className="font-bold text-slate-800">{previewDoc.name}</h3>
-              <button onClick={() => setPreviewDoc(null)} className="p-1 hover:bg-slate-100 rounded-md text-slate-500"><X size={20} /></button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-md" onClick={() => setPreviewDoc(null)}>
+          <div className="glass-panel neon-border flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden" onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-center p-4 border-b border-white/10">
+              <h3 className="font-bold text-white">{previewDoc.name}</h3>
+              <button onClick={() => setPreviewDoc(null)} className="rounded-lg p-2 text-slate-300 transition-colors hover:bg-white/10 hover:text-white"><X size={20} /></button>
             </div>
-            <div className="p-4 overflow-auto flex-1 bg-slate-50 flex justify-center items-center">
+            <div className="p-4 overflow-auto flex-1 bg-slate-950/30 flex justify-center items-center">
               {previewDoc.fileType && previewDoc.fileType.includes('pdf') ? (
-                <iframe src={previewDoc.dataUrl} className="w-full h-[70vh] rounded border border-slate-200" title="PDF Preview" />
+                <iframe src={previewDoc.dataUrl} className="w-full h-[70vh] rounded-2xl border border-white/10" title="PDF Preview" />
               ) : (
-                <img src={previewDoc.dataUrl} alt="Document Preview" className="max-w-full max-h-[70vh] object-contain rounded shadow-sm" />
+                <img src={previewDoc.dataUrl} alt="Document Preview" className="max-w-full max-h-[70vh] object-contain rounded-2xl shadow-2xl shadow-black/30" />
               )}
             </div>
           </div>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }
 

@@ -1,10 +1,12 @@
-import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import LandingPage from './components/LandingPage';
 import Login from './components/Login';
 import Signup from './components/Signup';
 import StudentDashboard from './components/StudentDashboard';
 import AdminDashboard from './components/AdminDashboard';
+import VerifyPage from './components/VerifyPage';
 import { LogOut, BookOpen } from 'lucide-react';
 
 function App() {
@@ -30,40 +32,49 @@ function App() {
 
   return (
     <Router>
-      <div className="min-h-screen flex flex-col bg-slate-50 font-sans">
-        
-        {/* Navigation Bar */}
-        <nav className="bg-white border-b border-slate-200 sticky top-0 z-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between h-16 items-center">
-              <div className="flex items-center gap-2 text-blue-600">
-                <BookOpen size={28} />
-                <span className="font-bold text-xl tracking-tight text-slate-800">Project Nexus</span>
-              </div>
-              {user && (
-                <div className="flex items-center gap-4">
-                  <span className="text-sm font-medium text-slate-600 bg-slate-100 px-3 py-1 rounded-full hidden sm:block">
-                    {user.username} ({user.role})
-                  </span>
-                  <button 
-                    onClick={handleLogout}
-                    className="flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-red-600 transition-colors"
-                  >
-                    <LogOut size={18} />
-                    <span>Logout</span>
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </nav>
+      <div className="relative min-h-screen overflow-hidden flex flex-col text-slate-100">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="floaty absolute -top-24 left-[-6rem] h-72 w-72 rounded-full bg-violet-500/25 blur-3xl" />
+          <div className="floaty absolute top-24 right-[-5rem] h-80 w-80 rounded-full bg-cyan-500/20 blur-3xl [animation-delay:2s]" />
+          <div className="floaty absolute bottom-[-4rem] left-1/3 h-72 w-72 rounded-full bg-blue-500/20 blur-3xl [animation-delay:4s]" />
+        </div>
 
-        {/* Main Content Area */}
-        <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 flex flex-col">
+        <motion.nav
+          initial={{ opacity: 0, y: -16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45 }}
+          className="sticky top-0 z-50 border-b border-white/10 bg-slate-950/55 backdrop-blur-2xl"
+        >
+          <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center gap-3">
+              <div className="rounded-2xl border border-white/10 bg-white/10 p-2 text-cyan-300 shadow-lg shadow-cyan-950/20">
+                <BookOpen size={22} />
+              </div>
+              <span className="text-lg font-semibold tracking-wide text-white">Project Nexus</span>
+            </div>
+            {user && (
+              <div className="flex items-center gap-3">
+                <span className="hidden rounded-full border border-white/10 bg-white/10 px-3 py-1 text-sm text-slate-200 sm:block">
+                  {user.username} ({user.role})
+                </span>
+                <button
+                  onClick={handleLogout}
+                  className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 transition-all duration-300 hover:bg-white/10 hover:text-white"
+                >
+                  <LogOut size={16} />
+                  <span>Logout</span>
+                </button>
+              </div>
+            )}
+          </div>
+        </motion.nav>
+
+        <main className="relative z-10 flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 flex flex-col">
           <Routes>
             <Route path="/" element={user ? <Navigate to="/dashboard" /> : <LandingPage />} />
             <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login setUser={setUser} />} />
             <Route path="/signup" element={user ? <Navigate to="/dashboard" /> : <Signup setUser={setUser} />} />
+            <Route path="/verify/:certId" element={<VerifyPage />} />
             
             <Route path="/dashboard" element={
               !user ? <Navigate to="/" /> :
@@ -73,12 +84,16 @@ function App() {
           </Routes>
         </main>
         
-        {/* Footer */}
-        <footer className="bg-white border-t border-slate-200 mt-auto py-6">
-          <div className="max-w-7xl mx-auto px-4 text-center text-sm text-slate-500">
+        <motion.footer
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45 }}
+          className="relative z-10 mt-auto border-t border-white/10 bg-slate-950/55 py-6 backdrop-blur-2xl"
+        >
+          <div className="mx-auto max-w-7xl px-4 text-center text-sm text-slate-400">
             &copy; {new Date().getFullYear()} Project Nexus. All rights reserved.
           </div>
-        </footer>
+        </motion.footer>
       </div>
     </Router>
   );

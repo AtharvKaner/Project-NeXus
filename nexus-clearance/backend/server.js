@@ -20,6 +20,8 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
+const BASE_URL = 'https://fragrant-setback-nursing.ngrok-free.dev';
+
 let memoryDues = []; // In-memory store for CSV dues
 const duesFilePath = path.join(__dirname, 'dues.json');
 const duesUpdatedCsvPath = path.join(__dirname, 'dues_updated.csv');
@@ -80,8 +82,6 @@ const formatDate = (dateValue) => {
 };
 
 const generateCertId = () => `CERT-${Date.now()}-${crypto.randomBytes(3).toString('hex').toUpperCase()}`;
-
-const getVerificationUrl = (certId, baseUrl) => `${baseUrl.replace(/\/$/, '')}/verify/${certId}`;
 
 const buildNoDuesCertificatePdf = async ({ request, dueRecords, verificationUrl, certId }) => {
   const doc = new PDFDocument({
@@ -640,7 +640,7 @@ app.get('/api/requests/:id/certificate/pdf', authMiddleware, async (req, res) =>
     }
 
     const dueRecords = await Due.find({ studentId: requestRecord.studentIdentifier }).lean();
-    const verifyURL = `http://10.10.122.150:5173/verify/${requestCertId}`;
+    const verifyURL = `${BASE_URL}/verify/${requestCertId}`;
     const pdf = await buildNoDuesCertificatePdf({
       request: requestRecord,
       dueRecords: dueRecords.length > 0 ? dueRecords : memoryDues.filter((due) => due.studentId === requestRecord.studentIdentifier)
