@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import StatusTracker from './StatusTracker';
 import Certificate from './Certificate';
-import { UploadCloud, FileText, CheckCircle, AlertCircle, Eye, ArrowRight } from 'lucide-react';
+import { UploadCloud, FileText, CheckCircle, AlertCircle, Eye, ArrowRight, Image as ImageIcon, X } from 'lucide-react';
 
 const API_URL = 'http://localhost:3000';
 
@@ -12,13 +12,28 @@ function StudentDashboard({ user }) {
   const [viewCert, setViewCert] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Document upload states
+  const [documents, setDocuments] = useState({
+    idCard: null,
+    libraryReceipt: null,
+    labClearance: null
+  });
+  const [docErrors, setDocErrors] = useState({
+    idCard: '',
+    libraryReceipt: '',
+    labClearance: ''
+  });
+  const [previewDoc, setPreviewDoc] = useState(null);
+
   useEffect(() => {
     fetchRequest();
   }, [user]);
 
   const fetchRequest = async () => {
     try {
-      const res = await fetch(`${API_URL}/api/requests/${user.username}`);
+      const res = await fetch(`${API_URL}/api/requests`, {
+        headers: { 'Authorization': `Bearer ${user.token}` }
+      });
       const data = await res.json();
       if (data && data.length > 0) {
         setRequest(data[0]);
@@ -31,32 +46,110 @@ function StudentDashboard({ user }) {
     }
   };
 
-  const handleSubmitRequest = async () => {
-    setIsSubmitting(true);
-    // Simulate slight delay for realistic upload feel
-    setTimeout(async () => {
-      try {
-        const res = await fetch(`${API_URL}/api/requests`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            studentId: user.username,
-            studentName: user.username.charAt(0).toUpperCase() + user.username.slice(1)
-          })
-        });
-        const data = await res.json();
-        if (res.ok) {
-          setRequest(data);
-        } else {
-          setError(data.message);
+  const handleFileUpload = (docType, file) => {
+    // Validation
+    setDocErrors(prev => ({ ...prev, [docType]: '' }));
+    
+    if (!file) return;
+
+    const validTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+    if (!validTypes.includes(file.type)) {
+      setDocErrors(prev => ({ ...prev, [docType]: 'Invalid file type. Only PDF, JPG, PNG allowed.' }));
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) { // 2MB
+      setDocErrors(prev => ({ ...prev, [docType]: 'File too large. Maximum size is 2MB.' }));
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setDocuments(prev => ({
+        ...prev,
+        [docType]: {
+          name: file.name,
+          fileType: file.type,
+          dataUrl: e.target.result
         }
-      } catch (err) {
-        setError('Failed to submit request.');
-      } finally {
-        setIsSubmitting(false);
-      }
-    }, 800);
+      }));
+    };
+    reader.readAsDataURL(file);
   };
+
+  const removeDocument = (docType) => {
+    setDocuments(prev => ({ ...prev, [docType]: null }));
+    setDocErrors(prev => ({ ...prev, [docType]: '' }));
+  };
+
+  const isFormComplete = documents.idCard && documents.libraryReceipt && documents.labClearance;
+
+  const handleSubmitRequest = async () => {
+    if (!isFormComplete) return;
+    
+    setIsSubmitting(true);
+    try {
+      const res = await fetch(`${API_URL}/api/requests`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user.token}`
+        },
+        body: JSON.stringify({ documents })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setRequest(data);
+      } else {
+        setError(data.message);
+      }
+    } catch (err) {
+      setError('Failed to submit request.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const DocumentCard = ({ title, type, doc, error }) => (
+    <div className={`p-4 rounded-xl border-2 transition-all ${doc ? 'border-green-200 bg-green-50/30' : error ? 'border-red-300 bg-red-50/50' : 'border-dashed border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-slate-300'}`}>
+      <div className="flex justify-between items-start mb-2">
+        <h4 className="font-semibold text-slate-800 text-sm">{title}</h4>
+        {doc && <CheckCircle size={16} className="text-green-500" />}
+      </div>
+      
+      {!doc ? (
+        <div className="relative">
+          <input 
+            type="file" 
+            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
+            accept=".pdf,.jpg,.jpeg,.png"
+            onChange={(e) => handleFileUpload(type, e.target.files[0])}
+            title={`Upload ${title}`}
+          />
+          <div className="flex flex-col items-center justify-center py-4 text-slate-400">
+            <UploadCloud size={24} className="mb-2" />
+            <span className="text-xs font-medium">Click or drag to upload</span>
+          </div>
+        </div>
+      ) : (
+        <div className="flex items-center justify-between bg-white p-2 rounded-lg border border-green-100 shadow-sm mt-2">
+          <div className="flex items-center gap-2 overflow-hidden">
+            {doc.fileType && doc.fileType.includes('pdf') ? <FileText size={18} className="text-red-500 shrink-0" /> : <ImageIcon size={18} className="text-blue-500 shrink-0" />}
+            <span className="text-xs font-medium text-slate-700 truncate">{doc.name}</span>
+          </div>
+          <div className="flex items-center gap-1 shrink-0">
+            <button className="p-1 hover:bg-slate-100 rounded text-slate-500" onClick={() => setPreviewDoc(doc)} title="Preview">
+              <Eye size={14} />
+            </button>
+            <button className="p-1 hover:bg-red-50 rounded text-slate-500 hover:text-red-600" onClick={() => removeDocument(type)} title="Remove">
+              <X size={14} />
+            </button>
+          </div>
+        </div>
+      )}
+      {error && <p className="text-[10px] text-red-600 mt-2 font-medium">{error}</p>}
+    </div>
+  );
 
   if (loading) {
     return (
@@ -67,7 +160,7 @@ function StudentDashboard({ user }) {
   }
 
   return (
-    <div className="animate-[fade-in_0.5s_ease] w-full max-w-3xl mx-auto">
+    <div className="animate-[fade-in_0.5s_ease] w-full max-w-4xl mx-auto">
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
         
         {/* Header Area */}
@@ -97,35 +190,33 @@ function StudentDashboard({ user }) {
 
           {!request ? (
             /* EMPTY STATE: ONBOARDING / UPLOAD */
-            <div className="max-w-md mx-auto text-center py-8">
-              <div className="w-20 h-20 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-6">
-                <FileText size={36} strokeWidth={1.5} />
+            <div className="max-w-3xl mx-auto">
+              <div className="mb-8 border-b border-slate-100 pb-6">
+                <h3 className="text-xl font-bold text-slate-800 mb-2">Document Verification</h3>
+                <p className="text-slate-500 text-sm leading-relaxed">
+                  Please upload the required verification documents to initiate your clearance workflow. All documents must be clearly legible. Maximum file size is 2MB (PDF, JPG, PNG).
+                </p>
               </div>
-              <h3 className="text-xl font-bold text-slate-800 mb-2">Initiate Clearance</h3>
-              <p className="text-slate-500 mb-8 text-sm leading-relaxed">
-                You have not submitted a clearance request yet. Upload your prerequisite documents to initiate the workflow across all departments.
-              </p>
               
-              <div className="border-2 border-dashed border-slate-300 rounded-xl p-8 mb-6 bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer group relative">
-                <input type="file" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" title="Click to upload documents" />
-                <UploadCloud size={32} className="text-slate-400 mx-auto mb-3 group-hover:text-blue-500 transition-colors" />
-                <p className="text-sm font-medium text-slate-700">Click or drag documents here</p>
-                <p className="text-xs text-slate-400 mt-1">PDF, JPG up to 10MB</p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <DocumentCard title="Student ID Card" type="idCard" doc={documents.idCard} error={docErrors.idCard} />
+                <DocumentCard title="Library Due Receipt" type="libraryReceipt" doc={documents.libraryReceipt} error={docErrors.libraryReceipt} />
+                <DocumentCard title="Lab Clearance Form" type="labClearance" doc={documents.labClearance} error={docErrors.labClearance} />
               </div>
 
-              <button 
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-xl flex items-center justify-center gap-2 transition-all shadow-sm disabled:opacity-70 disabled:cursor-not-allowed" 
-                onClick={handleSubmitRequest}
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? (
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                ) : (
-                  <>
-                    Submit Documents <ArrowRight size={18} />
-                  </>
-                )}
-              </button>
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-slate-50 rounded-xl border border-slate-200">
+                <div className="text-sm text-slate-600">
+                  <span className="font-semibold text-slate-800">Status:</span> {isFormComplete ? <span className="text-green-600 font-medium">Ready for Review</span> : 'Waiting for documents...'}
+                </div>
+                <button 
+                  className={`btn py-2.5 px-6 ${isFormComplete ? 'btn-primary' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}`} 
+                  onClick={handleSubmitRequest}
+                  disabled={!isFormComplete || isSubmitting}
+                >
+                  {isSubmitting ? 'Submitting...' : 'Submit Application'}
+                  {!isSubmitting && <ArrowRight size={18} />}
+                </button>
+              </div>
             </div>
           ) : (
             /* ACTIVE STATE: TRACKER */
@@ -133,12 +224,12 @@ function StudentDashboard({ user }) {
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-50 rounded-xl p-4 border border-slate-100 mb-10">
                 <div>
                   <p className="text-xs text-slate-500 uppercase font-semibold tracking-wider mb-1">Application ID</p>
-                  <p className="font-mono text-sm font-medium text-slate-800">#{request.id.toString().padStart(6, '0')}</p>
+                  <p className="font-mono text-sm font-medium text-slate-800">#{request.id.toString().substring(0,8)}</p>
                 </div>
                 <div className="hidden md:block w-px h-10 bg-slate-200"></div>
                 <div>
                   <p className="text-xs text-slate-500 uppercase font-semibold tracking-wider mb-1">Submitted On</p>
-                  <p className="text-sm font-medium text-slate-800">Today</p>
+                  <p className="text-sm font-medium text-slate-800">{new Date(request.createdAt).toLocaleDateString()}</p>
                 </div>
                 <div className="hidden md:block w-px h-10 bg-slate-200"></div>
                 <div>
@@ -187,6 +278,25 @@ function StudentDashboard({ user }) {
       {viewCert && request && request.finalStatus === 'approved' && (
         <div className="mt-8">
           <Certificate request={request} />
+        </div>
+      )}
+
+      {/* Document Preview Modal */}
+      {previewDoc && (
+        <div className="fixed inset-0 bg-slate-900/60 flex items-center justify-center z-50 p-4" onClick={() => setPreviewDoc(null)}>
+          <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col" onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-center p-4 border-b border-slate-100">
+              <h3 className="font-bold text-slate-800">{previewDoc.name}</h3>
+              <button onClick={() => setPreviewDoc(null)} className="p-1 hover:bg-slate-100 rounded-md text-slate-500"><X size={20} /></button>
+            </div>
+            <div className="p-4 overflow-auto flex-1 bg-slate-50 flex justify-center items-center">
+              {previewDoc.fileType && previewDoc.fileType.includes('pdf') ? (
+                <iframe src={previewDoc.dataUrl} className="w-full h-[70vh] rounded border border-slate-200" title="PDF Preview" />
+              ) : (
+                <img src={previewDoc.dataUrl} alt="Document Preview" className="max-w-full max-h-[70vh] object-contain rounded shadow-sm" />
+              )}
+            </div>
+          </div>
         </div>
       )}
     </div>

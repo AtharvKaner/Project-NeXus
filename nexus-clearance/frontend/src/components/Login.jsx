@@ -1,10 +1,15 @@
-import { useState } from 'react';
-import { LogIn, ShieldCheck } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { LogIn, ShieldCheck, ArrowLeft } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
 
 const API_URL = 'http://localhost:3000';
 
-function Login({ onLogin }) {
-  const [username, setUsername] = useState('');
+function Login({ setUser }) {
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const loginType = queryParams.get('type') || 'student';
+
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -18,13 +23,16 @@ function Login({ onLogin }) {
       const res = await fetch(`${API_URL}/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: username.toLowerCase(), password })
+        body: JSON.stringify({ email: email.toLowerCase(), password, loginType })
       });
 
       const data = await res.json();
       
-      if (data.success) {
-        onLogin({ role: data.role, username: data.username });
+      if (res.ok) {
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('role', data.role);
+        localStorage.setItem('username', data.name);
+        setUser({ token: data.token, role: data.role, username: data.name });
       } else {
         setError(data.message || 'Login failed');
       }
@@ -37,12 +45,16 @@ function Login({ onLogin }) {
 
   return (
     <div className="w-full max-w-md mx-auto my-auto animate-[fade-in_0.5s_ease]">
+      <Link to="/" className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-blue-600 mb-6 transition-colors">
+        <ArrowLeft size={16} /> Back to Home
+      </Link>
+
       <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 p-8 sm:p-10">
         <div className="flex flex-col items-center mb-8">
           <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-4">
             <ShieldCheck size={32} />
           </div>
-          <h2 className="text-2xl font-bold text-slate-800 tracking-tight">Nexus Portal</h2>
+          <h2 className="text-2xl font-bold text-slate-800 tracking-tight capitalize">{loginType} Portal</h2>
           <p className="text-slate-500 text-sm mt-1">Sign in to manage your clearances</p>
         </div>
         
@@ -55,14 +67,14 @@ function Login({ onLogin }) {
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label htmlFor="username" className="block text-sm font-medium text-slate-700 mb-1.5">Username</label>
+            <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1.5">Email Address</label>
             <input 
-              type="text" 
-              id="username" 
+              type="email" 
+              id="email" 
               className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" 
-              placeholder="Enter your username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>
@@ -94,25 +106,8 @@ function Login({ onLogin }) {
           </button>
         </form>
         
-        <div className="mt-8 pt-6 border-t border-slate-100">
-          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Demo Accounts</p>
-          <div className="grid grid-cols-2 gap-4 text-xs text-slate-500">
-            <div>
-              <strong className="block text-slate-700 mb-1">Students (Pass: 1234)</strong>
-              <ul className="space-y-1">
-                <li>• atharv, rahul, priya</li>
-                <li>• neha, rohit, vikas</li>
-              </ul>
-            </div>
-            <div>
-              <strong className="block text-slate-700 mb-1">Admins</strong>
-              <ul className="space-y-1">
-                <li>• lab / lab123</li>
-                <li>• hod / hod123</li>
-                <li>• principal / admin123</li>
-              </ul>
-            </div>
-          </div>
+        <div className="mt-6 text-center text-sm text-slate-500">
+          Don't have an account? <Link to="/signup" className="text-blue-600 font-medium hover:underline">Sign up</Link>
         </div>
       </div>
     </div>
