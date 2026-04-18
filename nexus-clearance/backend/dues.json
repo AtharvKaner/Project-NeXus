@@ -16,12 +16,12 @@
     "name": "Atharv",
     "department": "hostel",
     "amount": 1000,
-    "status": "unpaid",
+    "status": "paid",
     "reason": "room damage",
-    "transactionId": "",
-    "razorpayOrderId": "",
-    "razorpayPaymentId": "",
-    "paidAt": null
+    "transactionId": "txn_1776523680127_297c7247",
+    "razorpayOrderId": "order_SezgV1Ue30Y3Zh",
+    "razorpayPaymentId": "pay_SezgbO1n9ppHay",
+    "paidAt": "2026-04-18T14:48:00.129Z"
   },
   {
     "studentId": "102",
@@ -88,12 +88,12 @@
     "name": "Amit",
     "department": "library",
     "amount": 300,
-    "status": "unpaid",
+    "status": "paid",
     "reason": "book lost",
-    "transactionId": "",
-    "razorpayOrderId": "",
-    "razorpayPaymentId": "",
-    "paidAt": null
+    "transactionId": "txn_1776524428516_d74af943",
+    "razorpayOrderId": "order_SeztklDCqZPTcY",
+    "razorpayPaymentId": "pay_SeztpLc1f43csH",
+    "paidAt": "2026-04-18T15:00:28.516Z"
   },
   {
     "studentId": "105",

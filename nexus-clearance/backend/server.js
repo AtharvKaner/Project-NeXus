@@ -8,6 +8,8 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const { createObjectCsvWriter } = require('csv-writer');
+const PDFDocument = require('pdfkit');
+const QRCode = require('qrcode');
 
 const User = require('./models/User');
 const Request = require('./models/Request');
@@ -64,8 +66,131 @@ const exportDuesToCSV = async (allDues) => {
     status: due.status || 'unpaid',
     reason: due.reason || ''
   }));
+        const signatureX = pageWidth - 230;
+        const signatureY = pageHeight - 210;
+};
 
-  await csvWriter.writeRecords(rows);
+const formatDate = (dateValue) => {
+  const date = new Date(dateValue || Date.now());
+  return date.toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric'
+  });
+};
+
+const generateCertId = () => `CERT-${Date.now()}-${crypto.randomBytes(3).toString('hex').toUpperCase()}`;
+
+const getVerificationUrl = (certId, baseUrl) => `${baseUrl.replace(/\/$/, '')}/verify/${certId}`;
+
+const buildNoDuesCertificatePdf = async ({ request, dueRecords, verificationUrl, certId }) => {
+  const doc = new PDFDocument({
+    size: 'A4',
+    margin: 40,
+    bufferPages: true
+  });
+
+  const pageWidth = doc.page.width;
+  const pageHeight = doc.page.height;
+  const usableWidth = pageWidth - 120;
+  const departmentLabel = dueRecords.length > 0
+    ? [...new Set(dueRecords.map((due) => due.department).filter(Boolean))].join(', ')
+    : 'Institutional Clearance';
+
+  doc.rect(28, 28, pageWidth - 56, pageHeight - 56).lineWidth(1.5).strokeColor('#1e293b').stroke();
+
+  doc.save();
+  doc.fillColor('#cbd5e1').opacity(0.12).font('Helvetica-Bold').fontSize(34);
+  doc.rotate(-28, { origin: [pageWidth / 2, pageHeight / 2] });
+  doc.text('NEXUS SYSTEM', 0, pageHeight / 2 - 18, { width: pageWidth, align: 'center' });
+  doc.restore();
+
+  doc.fillColor('#0f172a').font('Helvetica-Bold').fontSize(24);
+  doc.text('NO DUES CERTIFICATE', 0, 70, { align: 'center', width: pageWidth });
+
+  doc.moveTo(150, 104).lineTo(pageWidth - 150, 104).lineWidth(1).strokeColor('#94a3b8').stroke();
+
+  doc.fillColor('#334155').font('Helvetica').fontSize(11);
+  doc.text('Certificate ID', 60, 120, { width: 100 });
+  doc.font('Helvetica-Bold').text(certId, 160, 120, { width: 240 });
+
+  doc.fillColor('#0f172a').font('Helvetica-Bold').fontSize(13);
+  doc.text('Student Details', 60, 155);
+
+  doc.roundedRect(60, 180, usableWidth, 120, 10).lineWidth(1).strokeColor('#cbd5e1').stroke();
+
+  const leftX = 80;
+  const valueX = 210;
+  const row1Y = 202;
+  const rowGap = 24;
+
+  doc.fillColor('#334155').font('Helvetica-Bold').fontSize(11);
+  doc.text('Student Name', leftX, row1Y);
+  doc.text('Student ID / Roll No.', leftX, row1Y + rowGap);
+  doc.text('Department', leftX, row1Y + rowGap * 2);
+
+  doc.fillColor('#0f172a').font('Helvetica').fontSize(11);
+  doc.text(request.studentName || '-', valueX, row1Y);
+  doc.text(request.studentIdentifier || request.studentId || '-', valueX, row1Y + rowGap);
+  doc.text(departmentLabel, valueX, row1Y + rowGap * 2, { width: usableWidth - 240 });
+
+  doc.fillColor('#111827').font('Helvetica').fontSize(13);
+  doc.text(
+    `This is to certify that the above-mentioned student (${request.studentName || '-'}) has cleared all dues and is eligible for clearance.`,
+    70,
+    330,
+    {
+      width: pageWidth - 140,
+      align: 'center',
+      lineGap: 4
+    }
+  );
+
+  doc.roundedRect(72, 392, pageWidth - 144, 70, 10).fillAndStroke('#f8fafc', '#e2e8f0');
+  doc.fillColor('#334155').font('Helvetica-Bold').fontSize(10);
+  doc.text('Status', 90, 412);
+  doc.text('Remarks', 230, 412);
+  doc.fillColor('#15803d').font('Helvetica-Bold').fontSize(12);
+  doc.text('ALL DUES CLEARED', 90, 428);
+  doc.fillColor('#334155').font('Helvetica').fontSize(10);
+  doc.text('Final principal approval confirmed and clearance marked complete.', 230, 428, {
+    width: pageWidth - 300
+  });
+
+  doc.fillColor('#0f172a').font('Helvetica-Bold').fontSize(11);
+  doc.text(`Issue Date: ${formatDate(Date.now())}`, 70, pageHeight - 125);
+
+  const signatureX = pageWidth - 230;
+  const signatureY = pageHeight - 210;
+  doc.moveTo(signatureX, signatureY).lineTo(signatureX + 150, signatureY).lineWidth(1).strokeColor('#0f172a').stroke();
+  doc.fillColor('#0f172a').font('Helvetica-Bold').fontSize(11);
+  doc.text('Authorized Signature', signatureX, signatureY + 8, { width: 160, align: 'center' });
+  doc.font('Helvetica-Bold').fontSize(12);
+  doc.text('B.N. Chaudhary', signatureX, signatureY + 24, { width: 160, align: 'center' });
+
+  doc.fillColor('#64748b').font('Helvetica').fontSize(9);
+  doc.text('Nexus Automated Clearance System', 70, pageHeight - 65, { width: pageWidth - 140, align: 'center' });
+
+  const qrCodeDataUrl = await QRCode.toDataURL(verificationUrl, {
+    errorCorrectionLevel: 'M',
+    margin: 1,
+    scale: 5,
+    width: 120,
+    color: {
+      dark: '#0f172a',
+      light: '#ffffff'
+    }
+  });
+
+  const qrX = pageWidth - 150;
+  const qrY = pageHeight - 140;
+  doc.roundedRect(qrX - 10, qrY - 10, 130, 130, 10).fillAndStroke('#ffffff', '#cbd5e1');
+  doc.image(qrCodeDataUrl, qrX, qrY, { width: 110, height: 110 });
+  doc.fillColor('#334155').font('Helvetica-Bold').fontSize(7.5);
+  doc.text('Scan to verify authenticity', qrX - 12, qrY + 114, { width: 135, align: 'center' });
+
+  doc.end();
+  return doc;
 };
 
 const updateCachedDue = (studentId, department, patch) => {
@@ -253,6 +378,7 @@ app.get('/api/requests', authMiddleware, async (req, res) => {
       studentId: r.studentId ? r.studentId._id : r.studentId,
       studentIdentifier: r.studentIdentifier,
       studentName: r.studentName,
+      certId: r.certId,
       documents: r.documents,
       status: r.status,
       finalStatus: r.finalStatus,
@@ -275,6 +401,7 @@ app.get('/api/requests/:userId', authMiddleware, async (req, res) => {
       id: r._id,
       studentId: r.studentId._id,
       studentName: r.studentName,
+      certId: r.certId,
       documents: r.documents,
       status: r.status,
       finalStatus: r.finalStatus,
@@ -344,6 +471,10 @@ app.post('/api/requests/:id/approve', authMiddleware, async (req, res) => {
           request.status.hod.state === 'approved' && 
           request.status.principal.state === 'approved') {
         request.finalStatus = 'approved';
+        if (!request.certId) {
+          request.certId = generateCertId();
+          request.certificateIssuedAt = new Date();
+        }
       }
       
       await request.save();
@@ -478,6 +609,78 @@ app.get('/api/admin/dues/export', authMiddleware, async (req, res) => {
   } catch (error) {
     console.error('Failed to export dues csv:', error);
     res.status(500).json({ message: 'Failed to export dues CSV' });
+  }
+});
+
+app.get('/api/requests/:id/certificate/pdf', authMiddleware, async (req, res) => {
+  try {
+    const requestRecord = await Request.findById(req.params.id).lean();
+    if (!requestRecord) {
+      return res.status(404).json({ message: 'Request not found' });
+    }
+
+    const isOwner = String(requestRecord.studentId) === String(req.user.id);
+    const isAdmin = ['lab', 'hod', 'principal'].includes(req.user.role);
+    if (!isOwner && !isAdmin) {
+      return res.status(403).json({ message: 'Not authorized to download this certificate' });
+    }
+
+    if (requestRecord.finalStatus !== 'approved') {
+      return res.status(400).json({ message: 'Certificate is available only after final approval' });
+    }
+
+    const requestCertId = requestRecord.certId || generateCertId();
+    if (!requestRecord.certId) {
+      await Request.findByIdAndUpdate(requestRecord._id, {
+        $set: {
+          certId: requestCertId,
+          certificateIssuedAt: requestRecord.certificateIssuedAt || new Date()
+        }
+      });
+    }
+
+    const dueRecords = await Due.find({ studentId: requestRecord.studentIdentifier }).lean();
+    const verifyURL = `http://10.10.122.150:5173/verify/${requestCertId}`;
+    const pdf = await buildNoDuesCertificatePdf({
+      request: requestRecord,
+      dueRecords: dueRecords.length > 0 ? dueRecords : memoryDues.filter((due) => due.studentId === requestRecord.studentIdentifier)
+      ,
+      verificationUrl: verifyURL,
+      certId: requestCertId
+    });
+
+    const filename = `no-dues-certificate-${requestRecord.studentIdentifier || requestRecord._id}.pdf`;
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    pdf.pipe(res);
+  } catch (error) {
+    console.error('Failed to generate certificate PDF:', error);
+    res.status(500).json({ message: 'Failed to generate certificate PDF' });
+  }
+});
+
+app.get('/verify/:certId', async (req, res) => {
+  try {
+    const requestRecord = await Request.findOne({ certId: req.params.certId, finalStatus: 'approved' }).lean();
+
+    if (!requestRecord) {
+      return res.status(404).json({ valid: false, message: 'Invalid certificate', studentInfo: null });
+    }
+
+    return res.json({
+      valid: true,
+      certId: requestRecord.certId,
+      studentInfo: {
+        studentName: requestRecord.studentName,
+        studentIdentifier: requestRecord.studentIdentifier,
+        requestId: requestRecord._id,
+        issuedAt: requestRecord.certificateIssuedAt || requestRecord.updatedAt,
+        finalStatus: requestRecord.finalStatus
+      }
+    });
+  } catch (error) {
+    console.error('Failed to verify certificate:', error);
+    res.status(500).json({ valid: false, message: 'Verification failed', studentInfo: null });
   }
 });
 

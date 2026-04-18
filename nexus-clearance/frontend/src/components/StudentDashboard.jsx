@@ -234,6 +234,31 @@ function StudentDashboard({ user }) {
     }
   };
 
+  const handleDownloadCertificate = async () => {
+    try {
+      const res = await fetch(`${API_URL}/api/requests/${request.id}/certificate/pdf`, {
+        headers: { 'Authorization': `Bearer ${user.token}` }
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.message || 'Failed to download certificate');
+      }
+
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = `no-dues-certificate-${user.identifier}.pdf`;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (downloadError) {
+      setError(downloadError.message || 'Failed to download certificate');
+    }
+  };
+
   const isFormComplete = documents.idCard && documents.libraryReceipt && documents.labClearance && !hasUnpaidDues;
 
   const handleSubmitRequest = async () => {
@@ -492,15 +517,23 @@ function StudentDashboard({ user }) {
                   <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
                     <CheckCircle size={32} />
                   </div>
-                  <h3 className="text-xl font-bold text-slate-800 mb-2">You're All Clear!</h3>
-                  <p className="text-slate-500 text-sm mb-6 max-w-sm mx-auto">Your clearance process is officially complete. You can now download or view your digital certificate.</p>
-                  <button 
-                    className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-slate-800 hover:bg-slate-900 text-white rounded-xl font-medium transition-all shadow-sm" 
-                    onClick={() => setViewCert(!viewCert)}
-                  >
-                    <Eye size={18} />
-                    {viewCert ? 'Hide Certificate' : 'View Digital Certificate'}
-                  </button>
+                  <h3 className="text-xl font-bold text-slate-800 mb-2">No Dues Certificate Ready</h3>
+                  <p className="text-slate-500 text-sm mb-6 max-w-sm mx-auto">Your clearance process is complete. View the certificate or download the official PDF signed by the principal.</p>
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                    <button 
+                      className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-slate-800 hover:bg-slate-900 text-white rounded-xl font-medium transition-all shadow-sm" 
+                      onClick={() => setViewCert(!viewCert)}
+                    >
+                      <Eye size={18} />
+                      {viewCert ? 'Hide Certificate' : 'View Certificate'}
+                    </button>
+                    <button
+                      className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-all shadow-sm"
+                      onClick={handleDownloadCertificate}
+                    >
+                      Download PDF
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
@@ -510,7 +543,7 @@ function StudentDashboard({ user }) {
 
       {viewCert && request && request.finalStatus === 'approved' && (
         <div className="mt-8">
-          <Certificate request={request} />
+          <Certificate request={request} dues={dues} />
         </div>
       )}
 

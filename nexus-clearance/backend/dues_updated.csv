@@ -1,6 +1,6 @@
 studentId,name,department,amount,status,reason
 101,Atharv,library,500,paid,2 books not returned
-101,Atharv,hostel,1000,unpaid,room damage
+101,Atharv,hostel,1000,paid,room damage
 102,Rahul,library,0,paid,-
 102,Rahul,lab,200,unpaid,equipment late return
 103,Neha,library,200,unpaid,late fine
