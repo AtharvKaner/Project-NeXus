@@ -1,12 +1,16 @@
 import { useState, useEffect } from 'react';
-import { CheckCircle, XCircle, Search, Filter, Inbox, Eye, FileText, Image as ImageIcon, X } from 'lucide-react';
+import { CheckCircle, XCircle, Search, Filter, Inbox, Eye, FileText, Image as ImageIcon, X, Table2, Download, RefreshCw, CircleDollarSign } from 'lucide-react';
 
 const API_URL = 'http://localhost:3000';
 
 function AdminDashboard({ user }) {
   const [requests, setRequests] = useState([]);
+  const [dues, setDues] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [duesLoading, setDuesLoading] = useState(false);
+  const [showDuesTable, setShowDuesTable] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   
   const [reviewingId, setReviewingId] = useState(null);
   const [reviewType, setReviewType] = useState(null); 
@@ -15,6 +19,26 @@ function AdminDashboard({ user }) {
   const [previewDoc, setPreviewDoc] = useState(null);
 
   const [isUploading, setIsUploading] = useState(false);
+
+  const fetchDues = async () => {
+    setDuesLoading(true);
+    try {
+      const res = await fetch(`${API_URL}/api/admin/dues`, {
+        headers: { 'Authorization': `Bearer ${user.token}` }
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setDues(data);
+      } else {
+        setError(data.message || 'Failed to fetch dues.');
+      }
+    } catch (err) {
+      console.error(err);
+      setError('Failed to fetch dues.');
+    } finally {
+      setDuesLoading(false);
+    }
+  };
 
   const fetchRequests = async () => {
     try {
@@ -33,6 +57,7 @@ function AdminDashboard({ user }) {
 
   useEffect(() => {
     fetchRequests();
+    fetchDues();
   }, []);
 
   const submitReview = async (id) => {
@@ -57,6 +82,7 @@ function AdminDashboard({ user }) {
         setReviewType(null);
         setReviewComment('');
         fetchRequests();
+        fetchDues();
       } else {
         const data = await res.json();
         alert(data.message || `Error marking as ${reviewType}`);
@@ -86,6 +112,7 @@ function AdminDashboard({ user }) {
         if (res.ok) {
           alert(data.message);
           fetchRequests();
+          fetchDues();
         } else {
           alert(data.message || 'Failed to upload CSV');
         }
@@ -97,6 +124,31 @@ function AdminDashboard({ user }) {
       }
     };
     reader.readAsText(file);
+  };
+
+  const handleDownloadCsv = async () => {
+    try {
+      const res = await fetch(`${API_URL}/api/admin/dues/export`, {
+        headers: { 'Authorization': `Bearer ${user.token}` }
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.message || 'Failed to export CSV');
+      }
+
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = 'dues_updated.csv';
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      setError(err.message || 'Failed to export CSV');
+    }
   };
 
   const isCurrentStage = (req) => {
@@ -124,6 +176,13 @@ function AdminDashboard({ user }) {
   };
 
   const actionableRequests = requests.filter(isCurrentStage);
+  const filteredDues = dues.filter((due) => {
+    const query = searchTerm.trim().toLowerCase();
+    if (!query) return true;
+
+    return [due.studentId, due.name, due.department, due.reason, due.status, String(due.amount)]
+      .some((value) => (value || '').toString().toLowerCase().includes(query));
+  });
 
   return (
     <div className="animate-[fade-in_0.5s_ease] w-full max-w-5xl mx-auto">
@@ -137,6 +196,20 @@ function AdminDashboard({ user }) {
           </p>
         </div>
         <div className="flex items-center gap-3">
+          <button
+            onClick={() => { setShowDuesTable(true); fetchDues(); }}
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 transition-colors shadow-sm"
+          >
+            <Table2 size={16} />
+            View Dues Table
+          </button>
+          <button
+            onClick={() => { fetchDues(); fetchRequests(); }}
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors shadow-sm"
+          >
+            <RefreshCw size={16} />
+            Refresh
+          </button>
           <div className="relative">
             <input 
               type="file" 
@@ -327,6 +400,106 @@ function AdminDashboard({ user }) {
           </div>
         )}
       </div>
+
+      {/* Dues Table Modal */}
+      {showDuesTable && (
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setShowDuesTable(false)}>
+          <div className="w-full max-w-6xl max-h-[90vh] overflow-hidden rounded-3xl bg-white shadow-2xl border border-slate-200" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-start justify-between gap-4 px-6 py-5 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white">
+              <div>
+                <div className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-blue-700 mb-3">
+                  <CircleDollarSign size={14} />
+                  MongoDB Dues
+                </div>
+                <h3 className="text-2xl font-bold text-slate-800">All Uploaded Dues</h3>
+                <p className="text-sm text-slate-500 mt-1">Live dues records synced after uploads and payments.</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={async () => {
+                    await fetchDues();
+                    setShowDuesTable(true);
+                  }}
+                  className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
+                >
+                  <RefreshCw size={16} className={duesLoading ? 'animate-spin' : ''} />
+                  Refresh Data
+                </button>
+                <button
+                  onClick={handleDownloadCsv}
+                  className="inline-flex items-center gap-2 rounded-xl bg-slate-800 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-900 transition-colors"
+                >
+                  <Download size={16} />
+                  Download CSV
+                </button>
+                <button onClick={() => setShowDuesTable(false)} className="rounded-xl p-2 text-slate-500 hover:bg-slate-100 transition-colors">
+                  <X size={20} />
+                </button>
+              </div>
+            </div>
+
+            <div className="px-6 py-4 border-b border-slate-100 bg-white">
+              <div className="relative max-w-md">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                <input
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Search student, department, amount, status..."
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-sm focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                />
+              </div>
+            </div>
+
+            <div className="max-h-[65vh] overflow-auto">
+              {duesLoading ? (
+                <div className="flex h-64 items-center justify-center text-slate-500">
+                  <RefreshCw className="mr-2 animate-spin" size={18} /> Loading dues...
+                </div>
+              ) : filteredDues.length === 0 ? (
+                <div className="flex h-64 flex-col items-center justify-center text-center text-slate-500 px-6">
+                  <Inbox size={36} className="mb-3 text-slate-300" />
+                  <p className="font-semibold text-slate-700">No dues found</p>
+                  <p className="text-sm mt-1">Upload a CSV or process a payment to see records here.</p>
+                </div>
+              ) : (
+                <table className="min-w-full divide-y divide-slate-200">
+                  <thead className="sticky top-0 bg-slate-50">
+                    <tr className="text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+                      <th className="px-6 py-4">Student ID</th>
+                      <th className="px-6 py-4">Name</th>
+                      <th className="px-6 py-4">Department</th>
+                      <th className="px-6 py-4">Amount</th>
+                      <th className="px-6 py-4">Status</th>
+                      <th className="px-6 py-4">Reason</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 bg-white">
+                    {filteredDues.map((due) => (
+                      <tr key={`${due.studentId}-${due.department}`} className={due.status === 'paid' ? 'bg-green-50/40' : 'bg-rose-50/30'}>
+                        <td className="px-6 py-4 font-mono text-sm text-slate-700">{due.studentId}</td>
+                        <td className="px-6 py-4 text-sm font-medium text-slate-800">{due.name || '-'}</td>
+                        <td className="px-6 py-4 text-sm capitalize text-slate-700">{due.department}</td>
+                        <td className="px-6 py-4 text-sm font-semibold text-slate-800">₹{Number(due.amount || 0).toLocaleString('en-IN')}</td>
+                        <td className="px-6 py-4">
+                          <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-bold uppercase tracking-wider ${due.status === 'paid' ? 'bg-green-100 text-green-700' : 'bg-rose-100 text-rose-700'}`}>
+                            {due.status}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-sm text-slate-600">{due.reason || '-'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+
+            <div className="flex items-center justify-between gap-4 border-t border-slate-100 bg-slate-50 px-6 py-4 text-sm text-slate-500">
+              <p>Total records: <span className="font-semibold text-slate-700">{filteredDues.length}</span></p>
+              <p>Source: MongoDB `Due` collection</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Admin Document Preview Modal */}
       {previewDoc && (

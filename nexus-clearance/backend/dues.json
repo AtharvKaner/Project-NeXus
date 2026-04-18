@@ -3,472 +3,480 @@
     "studentId": "101",
     "name": "Atharv",
     "department": "library",
-    "amount": "500",
-    "status": "unpaid",
-    "reason": "2 books not returned"
+    "amount": 500,
+    "status": "paid",
+    "reason": "2 books not returned",
+    "transactionId": "txn_1776522056214_1226ad6f",
+    "razorpayOrderId": "order_SezDvLveCtLaXl",
+    "razorpayPaymentId": "pay_SezE1ggIYkaAD8",
+    "paidAt": "2026-04-18T14:20:56.215Z"
   },
   {
     "studentId": "101",
     "name": "Atharv",
     "department": "hostel",
-    "amount": "1000",
+    "amount": 1000,
     "status": "unpaid",
-    "reason": "room damage"
-  },
-  {
-    "studentId": "",
-    "name": "",
-    "department": "",
-    "amount": "",
-    "status": "",
-    "reason": ""
+    "reason": "room damage",
+    "transactionId": "",
+    "razorpayOrderId": "",
+    "razorpayPaymentId": "",
+    "paidAt": null
   },
   {
     "studentId": "102",
     "name": "Rahul",
     "department": "library",
-    "amount": "0",
+    "amount": 0,
     "status": "paid",
-    "reason": "-"
+    "reason": "-",
+    "transactionId": "",
+    "razorpayOrderId": "",
+    "razorpayPaymentId": "",
+    "paidAt": null
   },
   {
     "studentId": "102",
     "name": "Rahul",
     "department": "lab",
-    "amount": "200",
+    "amount": 200,
     "status": "unpaid",
-    "reason": "equipment late return"
-  },
-  {
-    "studentId": "",
-    "name": "",
-    "department": "",
-    "amount": "",
-    "status": "",
-    "reason": ""
+    "reason": "equipment late return",
+    "transactionId": "",
+    "razorpayOrderId": "",
+    "razorpayPaymentId": "",
+    "paidAt": null
   },
   {
     "studentId": "103",
     "name": "Neha",
     "department": "library",
-    "amount": "200",
+    "amount": 200,
     "status": "unpaid",
-    "reason": "late fine"
+    "reason": "late fine",
+    "transactionId": "",
+    "razorpayOrderId": "",
+    "razorpayPaymentId": "",
+    "paidAt": null
   },
   {
     "studentId": "103",
     "name": "Neha",
     "department": "hostel",
-    "amount": "0",
+    "amount": 0,
     "status": "paid",
-    "reason": "-"
-  },
-  {
-    "studentId": "",
-    "name": "",
-    "department": "",
-    "amount": "",
-    "status": "",
-    "reason": ""
+    "reason": "-",
+    "transactionId": "",
+    "razorpayOrderId": "",
+    "razorpayPaymentId": "",
+    "paidAt": null
   },
   {
     "studentId": "104",
     "name": "Amit",
     "department": "lab",
-    "amount": "0",
+    "amount": 0,
     "status": "paid",
-    "reason": "-"
+    "reason": "-",
+    "transactionId": "",
+    "razorpayOrderId": "",
+    "razorpayPaymentId": "",
+    "paidAt": null
   },
   {
     "studentId": "104",
     "name": "Amit",
     "department": "library",
-    "amount": "300",
+    "amount": 300,
     "status": "unpaid",
-    "reason": "book lost"
-  },
-  {
-    "studentId": "",
-    "name": "",
-    "department": "",
-    "amount": "",
-    "status": "",
-    "reason": ""
+    "reason": "book lost",
+    "transactionId": "",
+    "razorpayOrderId": "",
+    "razorpayPaymentId": "",
+    "paidAt": null
   },
   {
     "studentId": "105",
     "name": "Priya",
     "department": "hostel",
-    "amount": "1500",
+    "amount": 1500,
     "status": "unpaid",
-    "reason": "maintenance charge"
+    "reason": "maintenance charge",
+    "transactionId": "",
+    "razorpayOrderId": "",
+    "razorpayPaymentId": "",
+    "paidAt": null
   },
   {
     "studentId": "105",
     "name": "Priya",
     "department": "library",
-    "amount": "0",
+    "amount": 0,
     "status": "paid",
-    "reason": "-"
-  },
-  {
-    "studentId": "",
-    "name": "",
-    "department": "",
-    "amount": "",
-    "status": "",
-    "reason": ""
+    "reason": "-",
+    "transactionId": "",
+    "razorpayOrderId": "",
+    "razorpayPaymentId": "",
+    "paidAt": null
   },
   {
     "studentId": "106",
     "name": "Karan",
     "department": "library",
-    "amount": "0",
+    "amount": 0,
     "status": "paid",
-    "reason": "-"
+    "reason": "-",
+    "transactionId": "",
+    "razorpayOrderId": "",
+    "razorpayPaymentId": "",
+    "paidAt": null
   },
   {
     "studentId": "106",
     "name": "Karan",
     "department": "lab",
-    "amount": "0",
+    "amount": 0,
     "status": "paid",
-    "reason": "-"
-  },
-  {
-    "studentId": "",
-    "name": "",
-    "department": "",
-    "amount": "",
-    "status": "",
-    "reason": ""
+    "reason": "-",
+    "transactionId": "",
+    "razorpayOrderId": "",
+    "razorpayPaymentId": "",
+    "paidAt": null
   },
   {
     "studentId": "107",
     "name": "Sneha",
     "department": "library",
-    "amount": "400",
+    "amount": 400,
     "status": "unpaid",
-    "reason": "book damage"
+    "reason": "book damage",
+    "transactionId": "",
+    "razorpayOrderId": "",
+    "razorpayPaymentId": "",
+    "paidAt": null
   },
   {
     "studentId": "107",
     "name": "Sneha",
     "department": "hostel",
-    "amount": "0",
+    "amount": 0,
     "status": "paid",
-    "reason": "-"
-  },
-  {
-    "studentId": "",
-    "name": "",
-    "department": "",
-    "amount": "",
-    "status": "",
-    "reason": ""
+    "reason": "-",
+    "transactionId": "",
+    "razorpayOrderId": "",
+    "razorpayPaymentId": "",
+    "paidAt": null
   },
   {
     "studentId": "108",
     "name": "Arjun",
     "department": "lab",
-    "amount": "250",
+    "amount": 250,
     "status": "unpaid",
-    "reason": "equipment damage"
+    "reason": "equipment damage",
+    "transactionId": "",
+    "razorpayOrderId": "",
+    "razorpayPaymentId": "",
+    "paidAt": null
   },
   {
     "studentId": "108",
     "name": "Arjun",
     "department": "library",
-    "amount": "0",
+    "amount": 0,
     "status": "paid",
-    "reason": "-"
-  },
-  {
-    "studentId": "",
-    "name": "",
-    "department": "",
-    "amount": "",
-    "status": "",
-    "reason": ""
+    "reason": "-",
+    "transactionId": "",
+    "razorpayOrderId": "",
+    "razorpayPaymentId": "",
+    "paidAt": null
   },
   {
     "studentId": "109",
     "name": "Ritika",
     "department": "hostel",
-    "amount": "0",
+    "amount": 0,
     "status": "paid",
-    "reason": "-"
+    "reason": "-",
+    "transactionId": "",
+    "razorpayOrderId": "",
+    "razorpayPaymentId": "",
+    "paidAt": null
   },
   {
     "studentId": "109",
     "name": "Ritika",
     "department": "library",
-    "amount": "150",
+    "amount": 150,
     "status": "unpaid",
-    "reason": "late return"
-  },
-  {
-    "studentId": "",
-    "name": "",
-    "department": "",
-    "amount": "",
-    "status": "",
-    "reason": ""
+    "reason": "late return",
+    "transactionId": "",
+    "razorpayOrderId": "",
+    "razorpayPaymentId": "",
+    "paidAt": null
   },
   {
     "studentId": "110",
     "name": "Manav",
     "department": "library",
-    "amount": "0",
+    "amount": 0,
     "status": "paid",
-    "reason": "-"
+    "reason": "-",
+    "transactionId": "",
+    "razorpayOrderId": "",
+    "razorpayPaymentId": "",
+    "paidAt": null
   },
   {
     "studentId": "110",
     "name": "Manav",
     "department": "lab",
-    "amount": "0",
+    "amount": 0,
     "status": "paid",
-    "reason": "-"
-  },
-  {
-    "studentId": "",
-    "name": "",
-    "department": "",
-    "amount": "",
-    "status": "",
-    "reason": ""
+    "reason": "-",
+    "transactionId": "",
+    "razorpayOrderId": "",
+    "razorpayPaymentId": "",
+    "paidAt": null
   },
   {
     "studentId": "111",
     "name": "Anjali",
     "department": "library",
-    "amount": "350",
+    "amount": 350,
     "status": "unpaid",
-    "reason": "book missing"
+    "reason": "book missing",
+    "transactionId": "",
+    "razorpayOrderId": "",
+    "razorpayPaymentId": "",
+    "paidAt": null
   },
   {
     "studentId": "111",
     "name": "Anjali",
     "department": "hostel",
-    "amount": "0",
+    "amount": 0,
     "status": "paid",
-    "reason": "-"
-  },
-  {
-    "studentId": "",
-    "name": "",
-    "department": "",
-    "amount": "",
-    "status": "",
-    "reason": ""
+    "reason": "-",
+    "transactionId": "",
+    "razorpayOrderId": "",
+    "razorpayPaymentId": "",
+    "paidAt": null
   },
   {
     "studentId": "112",
     "name": "Rohan",
     "department": "lab",
-    "amount": "0",
+    "amount": 0,
     "status": "paid",
-    "reason": "-"
+    "reason": "-",
+    "transactionId": "",
+    "razorpayOrderId": "",
+    "razorpayPaymentId": "",
+    "paidAt": null
   },
   {
     "studentId": "112",
     "name": "Rohan",
     "department": "library",
-    "amount": "100",
+    "amount": 100,
     "status": "unpaid",
-    "reason": "fine"
-  },
-  {
-    "studentId": "",
-    "name": "",
-    "department": "",
-    "amount": "",
-    "status": "",
-    "reason": ""
+    "reason": "fine",
+    "transactionId": "",
+    "razorpayOrderId": "",
+    "razorpayPaymentId": "",
+    "paidAt": null
   },
   {
     "studentId": "113",
     "name": "Kavya",
     "department": "hostel",
-    "amount": "1200",
+    "amount": 1200,
     "status": "unpaid",
-    "reason": "room repair"
+    "reason": "room repair",
+    "transactionId": "",
+    "razorpayOrderId": "",
+    "razorpayPaymentId": "",
+    "paidAt": null
   },
   {
     "studentId": "113",
     "name": "Kavya",
     "department": "library",
-    "amount": "0",
+    "amount": 0,
     "status": "paid",
-    "reason": "-"
-  },
-  {
-    "studentId": "",
-    "name": "",
-    "department": "",
-    "amount": "",
-    "status": "",
-    "reason": ""
+    "reason": "-",
+    "transactionId": "",
+    "razorpayOrderId": "",
+    "razorpayPaymentId": "",
+    "paidAt": null
   },
   {
     "studentId": "114",
     "name": "Varun",
     "department": "library",
-    "amount": "0",
+    "amount": 0,
     "status": "paid",
-    "reason": "-"
+    "reason": "-",
+    "transactionId": "",
+    "razorpayOrderId": "",
+    "razorpayPaymentId": "",
+    "paidAt": null
   },
   {
     "studentId": "114",
     "name": "Varun",
     "department": "lab",
-    "amount": "0",
+    "amount": 0,
     "status": "paid",
-    "reason": "-"
-  },
-  {
-    "studentId": "",
-    "name": "",
-    "department": "",
-    "amount": "",
-    "status": "",
-    "reason": ""
+    "reason": "-",
+    "transactionId": "",
+    "razorpayOrderId": "",
+    "razorpayPaymentId": "",
+    "paidAt": null
   },
   {
     "studentId": "115",
     "name": "Meera",
     "department": "library",
-    "amount": "200",
+    "amount": 200,
     "status": "unpaid",
-    "reason": "late fine"
+    "reason": "late fine",
+    "transactionId": "",
+    "razorpayOrderId": "",
+    "razorpayPaymentId": "",
+    "paidAt": null
   },
   {
     "studentId": "115",
     "name": "Meera",
     "department": "hostel",
-    "amount": "500",
+    "amount": 500,
     "status": "unpaid",
-    "reason": "cleaning charges"
-  },
-  {
-    "studentId": "",
-    "name": "",
-    "department": "",
-    "amount": "",
-    "status": "",
-    "reason": ""
+    "reason": "cleaning charges",
+    "transactionId": "",
+    "razorpayOrderId": "",
+    "razorpayPaymentId": "",
+    "paidAt": null
   },
   {
     "studentId": "116",
     "name": "Sahil",
     "department": "lab",
-    "amount": "0",
+    "amount": 0,
     "status": "paid",
-    "reason": "-"
+    "reason": "-",
+    "transactionId": "",
+    "razorpayOrderId": "",
+    "razorpayPaymentId": "",
+    "paidAt": null
   },
   {
     "studentId": "116",
     "name": "Sahil",
     "department": "library",
-    "amount": "0",
+    "amount": 0,
     "status": "paid",
-    "reason": "-"
-  },
-  {
-    "studentId": "",
-    "name": "",
-    "department": "",
-    "amount": "",
-    "status": "",
-    "reason": ""
+    "reason": "-",
+    "transactionId": "",
+    "razorpayOrderId": "",
+    "razorpayPaymentId": "",
+    "paidAt": null
   },
   {
     "studentId": "117",
     "name": "Divya",
     "department": "library",
-    "amount": "450",
+    "amount": 450,
     "status": "unpaid",
-    "reason": "book damage"
+    "reason": "book damage",
+    "transactionId": "",
+    "razorpayOrderId": "",
+    "razorpayPaymentId": "",
+    "paidAt": null
   },
   {
     "studentId": "117",
     "name": "Divya",
     "department": "hostel",
-    "amount": "0",
+    "amount": 0,
     "status": "paid",
-    "reason": "-"
-  },
-  {
-    "studentId": "",
-    "name": "",
-    "department": "",
-    "amount": "",
-    "status": "",
-    "reason": ""
+    "reason": "-",
+    "transactionId": "",
+    "razorpayOrderId": "",
+    "razorpayPaymentId": "",
+    "paidAt": null
   },
   {
     "studentId": "118",
     "name": "Yash",
     "department": "lab",
-    "amount": "300",
+    "amount": 300,
     "status": "unpaid",
-    "reason": "equipment fine"
+    "reason": "equipment fine",
+    "transactionId": "",
+    "razorpayOrderId": "",
+    "razorpayPaymentId": "",
+    "paidAt": null
   },
   {
     "studentId": "118",
     "name": "Yash",
     "department": "library",
-    "amount": "0",
+    "amount": 0,
     "status": "paid",
-    "reason": "-"
-  },
-  {
-    "studentId": "",
-    "name": "",
-    "department": "",
-    "amount": "",
-    "status": "",
-    "reason": ""
+    "reason": "-",
+    "transactionId": "",
+    "razorpayOrderId": "",
+    "razorpayPaymentId": "",
+    "paidAt": null
   },
   {
     "studentId": "119",
     "name": "Tanvi",
     "department": "hostel",
-    "amount": "0",
+    "amount": 0,
     "status": "paid",
-    "reason": "-"
+    "reason": "-",
+    "transactionId": "",
+    "razorpayOrderId": "",
+    "razorpayPaymentId": "",
+    "paidAt": null
   },
   {
     "studentId": "119",
     "name": "Tanvi",
     "department": "library",
-    "amount": "250",
+    "amount": 250,
     "status": "unpaid",
-    "reason": "late submission"
-  },
-  {
-    "studentId": "",
-    "name": "",
-    "department": "",
-    "amount": "",
-    "status": "",
-    "reason": ""
+    "reason": "late submission",
+    "transactionId": "",
+    "razorpayOrderId": "",
+    "razorpayPaymentId": "",
+    "paidAt": null
   },
   {
     "studentId": "120",
     "name": "Aryan",
     "department": "library",
-    "amount": "0",
+    "amount": 0,
     "status": "paid",
-    "reason": "-"
+    "reason": "-",
+    "transactionId": "",
+    "razorpayOrderId": "",
+    "razorpayPaymentId": "",
+    "paidAt": null
   },
   {
     "studentId": "120",
     "name": "Aryan",
     "department": "lab",
-    "amount": "0",
+    "amount": 0,
     "status": "paid",
-    "reason": "-"
+    "reason": "-",
+    "transactionId": "",
+    "razorpayOrderId": "",
+    "razorpayPaymentId": "",
+    "paidAt": null
   }
 ]

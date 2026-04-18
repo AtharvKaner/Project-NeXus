@@ -4,6 +4,7 @@ import Certificate from './Certificate';
 import { UploadCloud, FileText, CheckCircle, AlertCircle, Eye, ArrowRight, Image as ImageIcon, X } from 'lucide-react';
 
 const API_URL = 'http://localhost:3000';
+const RAZORPAY_KEY_ID = import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_Sey90jixlpZZSl';
 
 function StudentDashboard({ user }) {
   const [request, setRequest] = useState(null);
@@ -13,6 +14,9 @@ function StudentDashboard({ user }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [dues, setDues] = useState([]);
   const [hasUnpaidDues, setHasUnpaidDues] = useState(false);
+  const [processingDueKey, setProcessingDueKey] = useState('');
+  const [paymentMessage, setPaymentMessage] = useState('');
+  const [paymentReceipt, setPaymentReceipt] = useState(null);
 
   // Document upload states
   const [documents, setDocuments] = useState({
@@ -31,6 +35,29 @@ function StudentDashboard({ user }) {
     fetchRequest();
     fetchDues();
   }, [user]);
+
+  const dueKey = (due) => `${due.studentId || user.identifier}-${due.department || ''}`.toLowerCase();
+
+  const loadRazorpayScript = () => new Promise((resolve) => {
+    if (window.Razorpay) {
+      resolve(true);
+      return;
+    }
+
+    const existingScript = document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]');
+    if (existingScript) {
+      existingScript.addEventListener('load', () => resolve(true), { once: true });
+      existingScript.addEventListener('error', () => resolve(false), { once: true });
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.async = true;
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
 
   const fetchDues = async () => {
     try {
@@ -96,6 +123,115 @@ function StudentDashboard({ user }) {
   const removeDocument = (docType) => {
     setDocuments(prev => ({ ...prev, [docType]: null }));
     setDocErrors(prev => ({ ...prev, [docType]: '' }));
+  };
+
+  const verifyPayment = async (response, due) => {
+    const res = await fetch(`${API_URL}/api/verify-payment`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${user.token}`
+      },
+      body: JSON.stringify({
+        razorpay_order_id: response.razorpay_order_id,
+        razorpay_payment_id: response.razorpay_payment_id,
+        razorpay_signature: response.razorpay_signature,
+        studentId: user.identifier,
+        department: due.department
+      })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok || !data.success) {
+      throw new Error(data.message || 'Payment verification failed');
+    }
+
+    setPaymentReceipt({
+      transactionId: data.transactionId,
+      department: due.department,
+      amount: due.amount,
+      fallbackUsed: data.fallbackUsed || false
+    });
+    setPaymentMessage(data.message || 'Payment Successful');
+    await fetchDues();
+  };
+
+  const handlePayNow = async (due) => {
+    setError('');
+    setPaymentMessage('');
+    setPaymentReceipt(null);
+
+    const key = dueKey(due);
+    setProcessingDueKey(key);
+
+    try {
+      const scriptReady = await loadRazorpayScript();
+      if (!scriptReady) {
+        throw new Error('Unable to load Razorpay checkout');
+      }
+
+      const orderRes = await fetch(`${API_URL}/api/create-order`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user.token}`
+        },
+        body: JSON.stringify({
+          studentId: user.identifier,
+          department: due.department,
+          amount: due.amount
+        })
+      });
+
+      const orderData = await orderRes.json();
+
+      if (!orderRes.ok) {
+        throw new Error(orderData.message || 'Failed to create payment order');
+      }
+
+      const options = {
+        key: RAZORPAY_KEY_ID,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        order_id: orderData.order_id,
+        name: 'Nexus Automated Clearance System',
+        description: `${due.department} dues payment`,
+        prefill: {
+          name: user.username || '',
+          email: '',
+          contact: ''
+        },
+        theme: {
+          color: '#2563eb'
+        },
+        handler: async (response) => {
+          try {
+            await verifyPayment(response, due);
+          } catch (verificationError) {
+            setError(verificationError.message);
+          } finally {
+            setProcessingDueKey('');
+          }
+        },
+        modal: {
+          ondismiss: () => {
+            setProcessingDueKey('');
+          }
+        }
+      };
+
+      const razorpay = new window.Razorpay(options);
+      razorpay.on('payment.failed', (response) => {
+        const message = response?.error?.description || 'Payment failed';
+        setError(message);
+        setProcessingDueKey('');
+      });
+      razorpay.open();
+    } catch (paymentError) {
+      setError(paymentError.message || 'Payment could not be started');
+      setProcessingDueKey('');
+    }
   };
 
   const isFormComplete = documents.idCard && documents.libraryReceipt && documents.labClearance && !hasUnpaidDues;
@@ -204,6 +340,21 @@ function StudentDashboard({ user }) {
             </div>
           )}
 
+          {paymentMessage && (
+            <div className="bg-green-50 text-green-700 p-4 rounded-xl mb-6 text-sm border border-green-200 flex items-start gap-3">
+              <CheckCircle size={20} className="shrink-0 mt-0.5" />
+              <div>
+                <p className="font-semibold">{paymentMessage}</p>
+                {paymentReceipt && (
+                  <p className="mt-1 text-xs text-green-700/90">
+                    Receipt {paymentReceipt.transactionId} for {paymentReceipt.department} dues of ₹{paymentReceipt.amount}
+                    {paymentReceipt.fallbackUsed ? ' (demo fallback used)' : ''}
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Dues Section */}
           <div className="mb-8">
             <h3 className="text-xl font-bold text-slate-800 mb-4">Pending Institutional Dues</h3>
@@ -214,21 +365,47 @@ function StudentDashboard({ user }) {
                </div>
             ) : (
               <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {dues.map((d, idx) => (
-                    <div key={idx} className={`p-4 rounded-xl border ${d.status === 'unpaid' ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200'}`}>
-                      <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <p className="font-bold text-slate-800 capitalize">{d.department}</p>
-                          <p className="text-xs text-slate-500">{d.reason || 'No reason provided'}</p>
+                <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+                  <div className="grid grid-cols-[1.2fr_0.8fr_0.8fr_auto] gap-4 px-4 py-3 bg-slate-50 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                    <div>Department</div>
+                    <div>Amount</div>
+                    <div>Status</div>
+                    <div className="text-right">Action</div>
+                  </div>
+                  <div className="divide-y divide-slate-100">
+                    {dues.map((d) => {
+                      const key = dueKey(d);
+                      const isProcessing = processingDueKey === key;
+
+                      return (
+                        <div key={key} className={`grid grid-cols-1 gap-3 px-4 py-4 md:grid-cols-[1.2fr_0.8fr_0.8fr_auto] md:items-center ${d.status === 'unpaid' ? 'bg-red-50/40' : 'bg-green-50/30'}`}>
+                          <div>
+                            <p className="font-bold text-slate-800 capitalize">{d.department}</p>
+                            <p className="text-xs text-slate-500 mt-1">{d.reason || 'No reason provided'}</p>
+                          </div>
+                          <div className="font-bold text-slate-800">₹{d.amount}</div>
+                          <div>
+                            <span className={`text-[10px] uppercase font-bold tracking-wider px-2 py-1 rounded inline-block ${d.status === 'unpaid' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+                              {d.status}
+                            </span>
+                          </div>
+                          <div className="md:text-right">
+                            {d.status === 'unpaid' ? (
+                              <button
+                                className="w-full md:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+                                onClick={() => handlePayNow(d)}
+                                disabled={isProcessing}
+                              >
+                                {isProcessing ? 'Processing...' : 'Pay Now'}
+                              </button>
+                            ) : (
+                              <span className="text-xs font-medium text-green-700">Paid</span>
+                            )}
+                          </div>
                         </div>
-                        <div className="text-right">
-                          <p className={`font-bold text-lg ${d.status === 'unpaid' ? 'text-red-600' : 'text-green-600'}`}>₹{d.amount}</p>
-                          <p className={`text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded inline-block ${d.status === 'unpaid' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>{d.status}</p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                      );
+                    })}
+                  </div>
                 </div>
                 {hasUnpaidDues && (
                   <div className="bg-red-100 text-red-800 p-3 rounded-lg text-sm font-semibold flex items-center justify-center gap-2">
