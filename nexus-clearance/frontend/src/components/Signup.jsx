@@ -87,6 +87,20 @@ function Signup({ setUser }) {
           </div>
 
           <div>
+            <label className="mb-1.5 block text-sm font-medium text-slate-200">Role</label>
+            <select 
+              className="glass-input"
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+            >
+              <option value="student">Student</option>
+              <option value="lab">Lab Admin</option>
+              <option value="hod">HOD</option>
+              <option value="principal">Principal</option>
+            </select>
+          </div>
+
+          <div>
             <label htmlFor="identifier" className="mb-1.5 block text-sm font-medium text-slate-200">
               {role === 'student' ? 'Student ID' : 'Admin ID / Email'}
             </label>
@@ -111,20 +125,6 @@ function Signup({ setUser }) {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
-          </div>
-
-          <div>
-            <label className="mb-1.5 block text-sm font-medium text-slate-200">Role</label>
-            <select 
-              className="glass-input"
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-            >
-              <option value="student">Student</option>
-              <option value="lab">Lab Admin</option>
-              <option value="hod">HOD</option>
-              <option value="principal">Principal</option>
-            </select>
           </div>
 
           <motion.button 

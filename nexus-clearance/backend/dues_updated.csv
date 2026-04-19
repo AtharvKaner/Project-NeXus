@@ -2,11 +2,11 @@ studentId,name,department,amount,status,reason
 101,Atharv,library,500,paid,2 books not returned
 101,Atharv,hostel,1000,paid,room damage
 102,Rahul,library,0,paid,-
-102,Rahul,lab,200,unpaid,equipment late return
+102,Rahul,lab,200,paid,equipment late return
 103,Neha,library,200,unpaid,late fine
 103,Neha,hostel,0,paid,-
 104,Amit,lab,0,paid,-
-104,Amit,library,300,unpaid,book lost
+104,Amit,library,300,paid,book lost
 105,Priya,hostel,1500,unpaid,maintenance charge
 105,Priya,library,0,paid,-
 106,Karan,library,0,paid,-
@@ -23,7 +23,7 @@ studentId,name,department,amount,status,reason
 111,Anjali,hostel,0,paid,-
 112,Rohan,lab,0,paid,-
 112,Rohan,library,100,unpaid,fine
-113,Kavya,hostel,1200,unpaid,room repair
+113,Kavya,hostel,1200,paid,room repair
 113,Kavya,library,0,paid,-
 114,Varun,library,0,paid,-
 114,Varun,lab,0,paid,-
@@ -31,11 +31,11 @@ studentId,name,department,amount,status,reason
 115,Meera,hostel,500,unpaid,cleaning charges
 116,Sahil,lab,0,paid,-
 116,Sahil,library,0,paid,-
-117,Divya,library,450,unpaid,book damage
+117,Divya,library,450,paid,book damage
 117,Divya,hostel,0,paid,-
-118,Yash,lab,300,unpaid,equipment fine
+118,Yash,lab,300,paid,equipment fine
 118,Yash,library,0,paid,-
 119,Tanvi,hostel,0,paid,-
-119,Tanvi,library,250,unpaid,late submission
+119,Tanvi,library,250,paid,late submission
 120,Aryan,library,0,paid,-
 120,Aryan,lab,0,paid,-

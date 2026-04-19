@@ -74,8 +74,8 @@ const exportDuesToCSV = async (allDues) => {
     status: due.status || 'unpaid',
     reason: due.reason || ''
   }));
-        const signatureX = pageWidth - 230;
-        const signatureY = pageHeight - 210;
+  
+  await csvWriter.writeRecords(rows);
 };
 
 const formatDate = (dateValue) => {
@@ -564,6 +564,39 @@ app.post('/api/requests/:id/reject', authMiddleware, async (req, res) => {
   }
 });
 
+// Resubmit Stage
+app.post('/api/requests/:id/resubmit', authMiddleware, async (req, res) => {
+  try {
+    const request = await Request.findById(req.params.id);
+    if (!request) return res.status(404).json({ message: 'Request not found' });
+    if (request.studentId.toString() !== req.user.id) return res.status(403).json({ message: 'Not authorized to resubmit this request' });
+    if (request.finalStatus !== 'rejected') return res.status(400).json({ message: 'Only rejected requests can be resubmitted' });
+
+    // Find the level that rejected it and reset it
+    if (request.status.lab.state === 'rejected') {
+      request.status.lab = { state: 'pending', comment: request.status.lab.comment };
+    } else if (request.status.hod.state === 'rejected') {
+      request.status.hod = { state: 'pending', comment: request.status.hod.comment };
+    } else if (request.status.principal.state === 'rejected') {
+      request.status.principal = { state: 'pending', comment: request.status.principal.comment };
+    }
+
+    if (req.body.documents) {
+      request.documents = req.body.documents;
+      request.markModified('documents');
+    }
+
+    request.finalStatus = 'pending';
+    request.markModified('status');
+    
+    await request.save();
+    return res.json({ ...request.toJSON(), id: request._id });
+  } catch (err) {
+    console.error('Resubmit Error:', err);
+    res.status(500).json({ message: 'Failed to resubmit request' });
+  }
+});
+
 // --- DUES SYSTEM ---
 
 app.post('/api/admin/upload-dues', authMiddleware, async (req, res) => {
@@ -929,7 +962,7 @@ const verifyPaymentHandler = async (req, res) => {
     };
 
     await saveDueRecord(updatedDue);
-    const allDues = await Due.find();
+    const allDues = await Due.find().lean();
     await exportDuesToCSV(allDues);
 
     return res.json({

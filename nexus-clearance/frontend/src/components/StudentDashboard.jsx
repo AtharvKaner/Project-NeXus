@@ -293,6 +293,38 @@ function StudentDashboard({ user }) {
     }
   };
 
+  const handleResubmitRequest = async () => {
+    setIsSubmitting(true);
+    try {
+      const payload = {
+        documents: {
+          idCard: documents.idCard || request.documents?.idCard,
+          libraryReceipt: documents.libraryReceipt || request.documents?.libraryReceipt,
+          labClearance: documents.labClearance || request.documents?.labClearance
+        }
+      };
+
+      const res = await fetch(`${API_URL}/api/requests/${request._id || request.id}/resubmit`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user.token}` 
+        },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setRequest(data);
+      } else {
+        setError(data.message);
+      }
+    } catch (err) {
+      setError('Failed to resubmit request.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const DocumentCard = ({ title, type, doc, error }) => (
     <div className={`rounded-xl border p-5 transition-all ${doc ? 'border-emerald-500/30 bg-emerald-500/10' : error ? 'border-rose-500/30 bg-rose-500/10' : 'border-dashed border-white/20 bg-white/5 hover:bg-white/10 hover:border-white/40'}`}>
       <div className="flex justify-between items-start mb-2">
@@ -563,7 +595,19 @@ function StudentDashboard({ user }) {
                    <AlertCircle size={24} className="mt-0.5 shrink-0 text-rose-300" />
                    <div>
                      <h4 className="mb-1 font-bold text-rose-100">Action Required</h4>
-                     <p className="m-0 text-sm leading-relaxed text-rose-200">Your clearance request has been halted. Please resolve the issues noted in the timeline above and contact the respective department administration to proceed.</p>
+                     <p className="m-0 text-sm leading-relaxed text-rose-200 mb-4">Your clearance request has been halted. Please resolve the issues noted in the timeline above and contact the respective department administration to proceed.</p>
+                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 my-6">
+                       <DocumentCard title="Student ID Card" type="idCard" doc={documents.idCard || request.documents?.idCard} error={docErrors.idCard} />
+                       <DocumentCard title="Library Receipt" type="libraryReceipt" doc={documents.libraryReceipt || request.documents?.libraryReceipt} error={docErrors.libraryReceipt} />
+                       <DocumentCard title="Lab Clearance" type="labClearance" doc={documents.labClearance || request.documents?.labClearance} error={docErrors.labClearance} />
+                     </div>
+                     <button
+                       className="glow-button px-5 py-2 text-sm shadow-md transition-transform hover:scale-[1.02]"
+                       onClick={handleResubmitRequest}
+                       disabled={isSubmitting}
+                     >
+                       {isSubmitting ? 'Resubmitting...' : 'Upload Fixes & Re-Submit'}
+                     </button>
                    </div>
                  </div>
               )}

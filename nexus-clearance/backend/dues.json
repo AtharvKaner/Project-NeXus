@@ -292,12 +292,12 @@
     "name": "Kavya",
     "department": "hostel",
     "amount": 1200,
-    "status": "unpaid",
+    "status": "paid",
     "reason": "room repair",
-    "transactionId": "",
-    "razorpayOrderId": "",
-    "razorpayPaymentId": "",
-    "paidAt": null
+    "transactionId": "txn_1776573258293_b00fcad8",
+    "razorpayOrderId": "order_SfDlNlHLOhRdke",
+    "razorpayPaymentId": "pay_SfDlUadWadJKJ2",
+    "paidAt": "2026-04-19T04:34:18.293Z"
   },
   {
     "studentId": "113",
@@ -388,12 +388,12 @@
     "name": "Divya",
     "department": "library",
     "amount": 450,
-    "status": "unpaid",
+    "status": "paid",
     "reason": "book damage",
-    "transactionId": "",
-    "razorpayOrderId": "",
-    "razorpayPaymentId": "",
-    "paidAt": null
+    "transactionId": "txn_1776572645726_166280d4",
+    "razorpayOrderId": "order_SfDaLHxOMuMCUd",
+    "razorpayPaymentId": "pay_SfDafjZcgGV33G",
+    "paidAt": "2026-04-19T04:24:05.726Z"
   },
   {
     "studentId": "117",
@@ -412,12 +412,12 @@
     "name": "Yash",
     "department": "lab",
     "amount": 300,
-    "status": "unpaid",
+    "status": "paid",
     "reason": "equipment fine",
-    "transactionId": "",
-    "razorpayOrderId": "",
-    "razorpayPaymentId": "",
-    "paidAt": null
+    "transactionId": "txn_1776573070580_6e020c27",
+    "razorpayOrderId": "order_SfDi4WxHjeGt5e",
+    "razorpayPaymentId": "pay_SfDiBSn4X5rt8R",
+    "paidAt": "2026-04-19T04:31:10.580Z"
   },
   {
     "studentId": "118",
