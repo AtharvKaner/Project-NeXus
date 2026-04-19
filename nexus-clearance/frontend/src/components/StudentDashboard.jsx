@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import StatusTracker from './StatusTracker';
 import Certificate from './Certificate';
-import { UploadCloud, FileText, CheckCircle, AlertCircle, Eye, ArrowRight, Image as ImageIcon, X } from 'lucide-react';
+import { UploadCloud, FileText, CheckCircle, AlertCircle, Eye, ArrowRight, Image as ImageIcon, X, Calendar, Activity } from 'lucide-react';
 
 const API_URL = 'http://localhost:3000';
 const RAZORPAY_KEY_ID = import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_Sey90jixlpZZSl';
@@ -294,7 +294,7 @@ function StudentDashboard({ user }) {
   };
 
   const DocumentCard = ({ title, type, doc, error }) => (
-    <div className={`glass-card p-4 transition-all ${doc ? 'border-emerald-400/20 bg-emerald-500/10' : error ? 'border-rose-400/20 bg-rose-500/10' : 'border-dashed border-white/10 bg-white/5 hover:bg-white/10 hover:border-cyan-400/20'}`}>
+    <div className={`rounded-xl border p-5 transition-all ${doc ? 'border-emerald-500/30 bg-emerald-500/10' : error ? 'border-rose-500/30 bg-rose-500/10' : 'border-dashed border-white/20 bg-white/5 hover:bg-white/10 hover:border-white/40'}`}>
       <div className="flex justify-between items-start mb-2">
         <h4 className="font-semibold text-white text-sm">{title}</h4>
         {doc && <CheckCircle size={16} className="text-emerald-300" />}
@@ -317,7 +317,7 @@ function StudentDashboard({ user }) {
       ) : (
         <div className="mt-2 flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 p-2">
           <div className="flex items-center gap-2 overflow-hidden">
-            {doc.fileType && doc.fileType.includes('pdf') ? <FileText size={18} className="shrink-0 text-rose-300" /> : <ImageIcon size={18} className="shrink-0 text-cyan-300" />}
+            {doc.fileType && doc.fileType.includes('pdf') ? <FileText size={18} className="shrink-0 text-cyan-300" /> : <ImageIcon size={18} className="shrink-0 text-blue-300" />}
             <span className="truncate text-xs font-medium text-slate-100">{doc.name}</span>
           </div>
           <div className="flex items-center gap-1 shrink-0">
@@ -336,11 +336,11 @@ function StudentDashboard({ user }) {
 
   if (loading) {
     return (
-      <div className="glass-panel neon-border flex items-center justify-center px-6 py-16">
+      <div className="flex items-center justify-center px-6 py-16 rounded-2xl border border-white/10 bg-slate-900/60 shadow-2xl backdrop-blur-3xl">
         <div className="flex items-center gap-3 text-slate-200">
-          <div className="h-3 w-3 animate-pulse rounded-full bg-cyan-300"></div>
-          <div className="h-3 w-3 animate-pulse rounded-full bg-violet-300 [animation-delay:150ms]"></div>
-          <div className="h-3 w-3 animate-pulse rounded-full bg-indigo-300 [animation-delay:300ms]"></div>
+          <div className="h-3 w-3 animate-pulse rounded-full bg-cyan-400"></div>
+          <div className="h-3 w-3 animate-pulse rounded-full bg-blue-400 [animation-delay:150ms]"></div>
+          <div className="h-3 w-3 animate-pulse rounded-full bg-indigo-400 [animation-delay:300ms]"></div>
           <span className="ml-2 text-sm font-medium text-slate-300">Loading clearance workspace...</span>
         </div>
       </div>
@@ -349,12 +349,12 @@ function StudentDashboard({ user }) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 18 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.45, ease: 'easeOut' }}
+      transition={{ duration: 0.3, ease: 'easeOut' }}
       className="w-full max-w-5xl mx-auto"
     >
-      <div className="glass-panel neon-border overflow-hidden">
+      <div className="rounded-2xl border border-white/10 bg-slate-900/60 shadow-2xl backdrop-blur-3xl overflow-hidden flex flex-col">
         
         {/* Header Area */}
         <div className="border-b border-white/10 bg-white/5 px-6 py-5 backdrop-blur-xl flex justify-between items-center">
@@ -364,9 +364,9 @@ function StudentDashboard({ user }) {
           </div>
           {request && (
             <div className={`px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider border ${
-              request.finalStatus === 'approved' ? 'border-emerald-400/20 bg-emerald-500/10 text-emerald-200' :
-              request.finalStatus === 'rejected' ? 'border-rose-400/20 bg-rose-500/10 text-rose-200' :
-              'border-amber-400/20 bg-amber-500/10 text-amber-200'
+              request.finalStatus === 'approved' ? 'border-emerald-400/30 bg-emerald-500/10 text-emerald-200' :
+              request.finalStatus === 'rejected' ? 'border-rose-400/30 bg-rose-500/10 text-rose-200' :
+              'border-amber-400/30 bg-amber-500/10 text-amber-200'
             }`}>
               {request.finalStatus}
             </div>
@@ -375,14 +375,14 @@ function StudentDashboard({ user }) {
 
         <div className="space-y-8 p-6 md:p-8">
           {error && (
-            <div className="flex items-start gap-3 rounded-2xl border border-rose-400/20 bg-rose-500/10 p-4 text-sm text-rose-200">
+            <div className="flex items-start gap-3 rounded-xl border border-rose-400/20 bg-rose-500/10 p-4 text-sm text-rose-200">
               <AlertCircle size={20} className="shrink-0 mt-0.5" />
               <p>{error}</p>
             </div>
           )}
 
           {paymentMessage && (
-            <div className="flex items-start gap-3 rounded-2xl border border-emerald-400/20 bg-emerald-500/10 p-4 text-sm text-emerald-200">
+            <div className="flex items-start gap-3 rounded-xl border border-emerald-400/20 bg-emerald-500/10 p-4 text-sm text-emerald-200">
               <CheckCircle size={20} className="shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">{paymentMessage}</p>
@@ -400,13 +400,19 @@ function StudentDashboard({ user }) {
           <div className="mb-8">
             <h3 className="text-xl font-bold text-white mb-4">Pending Institutional Dues</h3>
             {dues.length === 0 ? (
-               <div className="flex items-center gap-3 rounded-2xl border border-emerald-400/20 bg-emerald-500/10 p-4 text-sm text-emerald-200">
-                 <CheckCircle size={20} className="shrink-0" />
-                 <p className="font-semibold">No pending dues found. You are cleared financially.</p>
+               <div className="relative overflow-hidden flex items-center gap-4 rounded-xl border border-emerald-400/30 bg-gradient-to-r from-emerald-500/10 to-emerald-900/10 p-5 shadow-[0_0_30px_rgba(52,211,153,0.1)] backdrop-blur-md">
+                 <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-emerald-500/20 blur-2xl"></div>
+                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-emerald-400/50 bg-emerald-500/20 text-emerald-300 shadow-[0_0_15px_rgba(52,211,153,0.3)]">
+                   <CheckCircle size={22} />
+                 </div>
+                 <div className="relative z-10">
+                   <p className="text-sm font-bold text-emerald-100 tracking-wide uppercase">Financial Clearance Verified</p>
+                   <p className="text-xs text-emerald-200/80 mt-0.5 font-medium">No pending dues found. You are cleared financially.</p>
+                 </div>
                </div>
             ) : (
               <>
-                <div className="grid gap-4 lg:grid-cols-2">
+                <div className="flex flex-col gap-3">
                   {dues.map((d, index) => {
                     const key = dueKey(d);
                     const isProcessing = processingDueKey === key;
@@ -414,52 +420,45 @@ function StudentDashboard({ user }) {
                     return (
                       <motion.div
                         key={key}
-                        initial={{ opacity: 0, y: 16 }}
+                        initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.35, delay: index * 0.05 }}
-                        whileHover={{ y: -6, scale: 1.01 }}
-                        className="glass-card group relative overflow-hidden border border-white/10 p-5"
+                        transition={{ duration: 0.2, delay: index * 0.05 }}
+                        className="relative overflow-hidden rounded-xl border border-white/10 bg-white/5 p-4 transition-colors hover:bg-white/10 shadow-sm"
                       >
-                        <div className={`absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 ${d.status === 'unpaid' ? 'bg-[radial-gradient(circle_at_top_right,rgba(244,63,94,0.14),transparent_40%)]' : 'bg-[radial-gradient(circle_at_top_right,rgba(34,197,94,0.14),transparent_40%)]'}`} />
-                        <div className="relative z-10">
-                          <div className="mb-5 flex items-start justify-between gap-4">
-                            <div className="flex items-center gap-3">
-                              <div className="rounded-2xl border border-white/10 bg-white/5 p-3 text-cyan-300 shadow-lg shadow-cyan-950/20">
-                                {d.department?.includes('lab') ? <FileText size={20} /> : d.department?.includes('hostel') ? <ImageIcon size={20} /> : <AlertCircle size={20} />}
-                              </div>
-                              <div>
-                                <p className="text-xs uppercase tracking-[0.22em] text-slate-400">Department</p>
-                                <p className="text-xl font-bold capitalize text-white">{d.department}</p>
-                              </div>
+                        <div className={`absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 ${d.status === 'unpaid' ? 'bg-[radial-gradient(circle_at_right,rgba(244,63,94,0.1),transparent_40%)]' : 'bg-[radial-gradient(circle_at_right,rgba(34,197,94,0.1),transparent_40%)]'}`} />
+                        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                          <div className="flex items-center gap-3">
+                            <div className="rounded-lg border border-white/10 bg-white/5 p-2.5 text-cyan-300 shadow-md shadow-cyan-950/20 shrink-0">
+                              {d.department?.includes('lab') ? <FileText size={18} /> : d.department?.includes('hostel') ? <ImageIcon size={18} /> : <AlertCircle size={18} />}
                             </div>
-                            <span className={`rounded-full border px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${d.status === 'unpaid' ? 'border-rose-400/20 bg-rose-500/10 text-rose-200' : 'border-emerald-400/20 bg-emerald-500/10 text-emerald-200'}`}>
-                              {d.status}
-                            </span>
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <p className="text-sm font-bold capitalize text-white">{d.department} Dues</p>
+                                <span className={`rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${d.status === 'unpaid' ? 'border-rose-400/20 bg-rose-500/10 text-rose-200' : 'border-emerald-400/20 bg-emerald-500/10 text-emerald-200'}`}>
+                                  {d.status}
+                                </span>
+                              </div>
+                              <p className="text-xs text-slate-400 mt-0.5 line-clamp-1">{d.reason || 'Institutional clearance fee'}</p>
+                            </div>
                           </div>
 
-                          <div className="mb-4 rounded-2xl border border-white/10 bg-white/5 p-4">
-                            <div className="text-xs uppercase tracking-[0.24em] text-slate-400">Amount Due</div>
-                            <div className="mt-1 text-3xl font-black text-white">₹{d.amount}</div>
-                            <p className="mt-2 text-sm text-slate-300">{d.reason || 'No reason provided'}</p>
-                          </div>
-
-                          <div className="flex items-center justify-between gap-3">
-                            <div className="text-xs text-slate-400">
-                              {d.status === 'unpaid' ? 'Payment required' : 'Payment received'}
+                          <div className="flex items-center justify-between sm:justify-end gap-5 sm:ml-auto w-full sm:w-auto mt-1 sm:mt-0 pt-3 sm:pt-0 border-t sm:border-t-0 border-white/5">
+                            <div className="text-left sm:text-right">
+                              <div className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold">Amount</div>
+                              <div className="text-lg font-black text-white leading-none mt-0.5">₹{d.amount}</div>
                             </div>
+                            
                             {d.status === 'unpaid' ? (
-                              <motion.button
-                                whileHover={{ scale: 1.03 }}
-                                whileTap={{ scale: 0.97 }}
-                                className="glow-button px-4 py-2.5 text-sm"
+                              <button
+                                className="glow-button px-4 py-2 text-xs shadow-md transition-transform hover:scale-[1.02] whitespace-nowrap"
                                 onClick={() => handlePayNow(d)}
                                 disabled={isProcessing}
                               >
                                 {isProcessing ? 'Processing...' : 'Pay Now'}
-                              </motion.button>
+                              </button>
                             ) : (
-                              <span className="rounded-full border border-emerald-400/20 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-200">
-                                Paid
+                              <span className="rounded-full border border-emerald-400/20 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-200 whitespace-nowrap">
+                                <CheckCircle size={14} className="inline mr-1 mb-0.5" /> Paid
                               </span>
                             )}
                           </div>
@@ -469,12 +468,12 @@ function StudentDashboard({ user }) {
                   })}
                 </div>
                 {hasUnpaidDues && (
-                  <div className="flex items-center justify-center gap-2 rounded-2xl border border-rose-400/20 bg-rose-500/10 p-3 text-sm font-semibold text-rose-200">
+                  <div className="flex items-center justify-center gap-2 rounded-xl border border-rose-400/20 bg-rose-500/10 p-3 text-sm font-semibold text-rose-200 mt-4">
                     <AlertCircle size={18} /> Clearance blocked due to pending unpaid dues.
                   </div>
                 )}
                 {!hasUnpaidDues && dues.length > 0 && (
-                  <div className="flex items-center justify-center gap-2 rounded-2xl border border-emerald-400/20 bg-emerald-500/10 p-3 text-sm font-semibold text-emerald-200">
+                  <div className="flex items-center justify-center gap-2 rounded-xl border border-emerald-400/20 bg-emerald-500/10 p-3 text-sm font-semibold text-emerald-200 mt-4">
                     <CheckCircle size={18} /> All listed dues have been paid.
                   </div>
                 )}
@@ -485,7 +484,7 @@ function StudentDashboard({ user }) {
           {!request ? (
             /* EMPTY STATE: ONBOARDING / UPLOAD */
             <div className="mx-auto max-w-4xl">
-              <div className="mb-8 border-b border-white/10 pb-6">
+              <div className="mb-6 border-b border-white/10 pb-4">
                 <h3 className="text-xl font-bold text-white mb-2">Document Verification</h3>
                 <p className="text-sm leading-relaxed text-slate-300">
                   Please upload the required verification documents to initiate your clearance workflow. All documents must be clearly legible. Maximum file size is 2MB (PDF, JPG, PNG).
@@ -498,12 +497,12 @@ function StudentDashboard({ user }) {
                 <DocumentCard title="Lab Clearance Form" type="labClearance" doc={documents.labClearance} error={docErrors.labClearance} />
               </div>
 
-              <div className="glass-card flex flex-col items-center justify-between gap-4 p-4 sm:flex-row">
+              <div className="rounded-xl border border-white/10 bg-white/5 flex flex-col items-center justify-between gap-4 p-5 sm:flex-row mt-2">
                 <div className="text-sm text-slate-300">
                   <span className="font-semibold text-white">Status:</span> {isFormComplete ? <span className="font-medium text-emerald-300">Ready for Review</span> : hasUnpaidDues ? <span className="font-medium text-rose-300">Blocked by Unpaid Dues</span> : 'Waiting for documents...'}
                 </div>
                 <button 
-                  className={`glow-button py-2.5 px-6 ${isFormComplete ? '' : 'cursor-not-allowed opacity-40 grayscale'}`} 
+                  className={`glow-button py-2.5 px-6 shadow-md transition-transform hover:scale-[1.02] ${isFormComplete ? '' : 'cursor-not-allowed opacity-50 grayscale hover:scale-100'}`} 
                   onClick={handleSubmitRequest}
                   disabled={!isFormComplete || isSubmitting || hasUnpaidDues}
                 >
@@ -515,31 +514,52 @@ function StudentDashboard({ user }) {
           ) : (
             /* ACTIVE STATE: TRACKER */
             <div>
-              <div className="glass-card mb-10 flex flex-col justify-between gap-4 p-4 md:flex-row md:items-center">
-                <div>
-                  <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-400">Application ID</p>
-                  <p className="font-mono text-sm font-medium text-white">#{request.id.toString().substring(0,8)}</p>
-                </div>
-                <div className="hidden h-10 w-px bg-white/10 md:block"></div>
-                <div>
-                  <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-400">Submitted On</p>
-                  <p className="text-sm font-medium text-white">{new Date(request.createdAt).toLocaleDateString()}</p>
-                </div>
-                <div className="hidden h-10 w-px bg-white/10 md:block"></div>
-                <div>
-                  <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-400">Current Stage</p>
-                  <p className="text-sm font-medium text-white capitalize">
-                    {request.status.lab.state === 'pending' ? 'Lab Clearance' : 
-                     request.status.hod.state === 'pending' ? 'HOD Review' : 
-                     request.status.principal.state === 'pending' ? 'Principal Review' : 'Completed'}
+              <div className="relative overflow-hidden rounded-2xl border border-cyan-500/20 bg-gradient-to-br from-slate-900/90 to-slate-800/90 mb-10 flex flex-col justify-between gap-5 p-6 md:flex-row md:items-center shadow-[0_8px_30px_rgba(0,0,0,0.4)] backdrop-blur-xl">
+                {/* Decorative background elements */}
+                <div className="absolute top-0 right-0 -mt-10 -mr-10 h-32 w-32 rounded-full bg-cyan-500/10 blur-3xl pointer-events-none"></div>
+                <div className="absolute bottom-0 left-0 -mb-10 -ml-10 h-32 w-32 rounded-full bg-blue-500/10 blur-3xl pointer-events-none"></div>
+                
+                <div className="relative z-10 flex flex-col gap-1.5">
+                  <p className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-400">
+                    <FileText size={12} /> Application ID
                   </p>
+                  <p className="font-mono text-lg font-black tracking-wider text-white">
+                    #{request.id.toString().substring(0,8)}
+                  </p>
+                </div>
+                
+                <div className="hidden h-12 w-px bg-gradient-to-b from-transparent via-cyan-500/30 to-transparent md:block"></div>
+                
+                <div className="relative z-10 flex flex-col gap-1.5">
+                  <p className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
+                    <Calendar size={12} /> Submitted On
+                  </p>
+                  <p className="text-base font-semibold text-white tracking-wide">
+                    {new Date(request.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                  </p>
+                </div>
+                
+                <div className="hidden h-12 w-px bg-gradient-to-b from-transparent via-cyan-500/30 to-transparent md:block"></div>
+                
+                <div className="relative z-10 flex flex-col gap-1.5">
+                  <p className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
+                    <Activity size={12} /> Current Stage
+                  </p>
+                  <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-500/10 px-3 py-1 shadow-[0_0_15px_rgba(6,182,212,0.15)]">
+                    <div className="h-2 w-2 animate-pulse rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.8)]"></div>
+                    <span className="text-xs font-bold text-cyan-100 uppercase tracking-wide">
+                      {request.status.lab.state === 'pending' ? 'Lab Clearance' : 
+                       request.status.hod.state === 'pending' ? 'HOD Review' : 
+                       request.status.principal.state === 'pending' ? 'Principal Review' : 'Completed'}
+                    </span>
+                  </div>
                 </div>
               </div>
               
               <StatusTracker status={request.status} />
 
               {request.finalStatus === 'rejected' && (
-                 <div className="mt-12 flex items-start gap-4 rounded-2xl border border-rose-400/20 bg-rose-500/10 p-5">
+                 <div className="mt-12 flex items-start gap-4 rounded-xl border border-rose-400/20 bg-rose-500/10 p-5">
                    <AlertCircle size={24} className="mt-0.5 shrink-0 text-rose-300" />
                    <div>
                      <h4 className="mb-1 font-bold text-rose-100">Action Required</h4>
@@ -550,27 +570,27 @@ function StudentDashboard({ user }) {
               
               {request.finalStatus === 'approved' && (
                 <div className="mt-12 border-t border-white/10 pt-8 text-center">
-                  <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full border border-emerald-400/20 bg-emerald-500/15 text-emerald-300 shadow-[0_0_30px_rgba(34,197,94,0.22)]">
+                  <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full border border-emerald-400/30 bg-emerald-500/20 text-emerald-300 shadow-[0_0_20px_rgba(34,197,94,0.15)]">
                     <CheckCircle size={32} />
                   </div>
                   <h3 className="mb-2 text-xl font-bold text-white">No Dues Certificate Ready</h3>
                   <p className="mx-auto mb-6 max-w-sm text-sm text-slate-300">Your clearance process is complete. View the certificate or download the official PDF signed by the principal.</p>
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                     <button 
-                      className="glow-button px-6 py-3" 
+                      className="rounded-lg bg-white/10 border border-white/20 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-white/20"
                       onClick={() => setViewCert(!viewCert)}
                     >
-                      <Eye size={18} />
+                      <Eye size={18} className="inline mr-2" />
                       {viewCert ? 'Hide Certificate' : 'View Certificate'}
                     </button>
                     <button
-                      className="glow-button px-6 py-3"
+                      className="glow-button px-6 py-2.5 text-sm shadow-md transition-transform hover:scale-[1.02]"
                       onClick={handleDownloadCertificate}
                     >
                       Download PDF
                     </button>
                     <button
-                      className="glow-button px-6 py-3"
+                      className="glow-button px-6 py-2.5 text-sm shadow-md transition-transform hover:scale-[1.02]"
                       onClick={handleDownloadLocker}
                     >
                       Download Locker
@@ -592,16 +612,16 @@ function StudentDashboard({ user }) {
       {/* Document Preview Modal */}
       {previewDoc && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-md" onClick={() => setPreviewDoc(null)}>
-          <div className="glass-panel neon-border flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden" onClick={e => e.stopPropagation()}>
-            <div className="flex justify-between items-center p-4 border-b border-white/10">
+          <div className="flex w-full max-w-4xl max-h-[90vh] flex-col overflow-hidden rounded-2xl border border-white/10 bg-slate-900/80 shadow-2xl backdrop-blur-3xl" onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-center p-4 border-b border-white/10 bg-white/5">
               <h3 className="font-bold text-white">{previewDoc.name}</h3>
               <button onClick={() => setPreviewDoc(null)} className="rounded-lg p-2 text-slate-300 transition-colors hover:bg-white/10 hover:text-white"><X size={20} /></button>
             </div>
-            <div className="p-4 overflow-auto flex-1 bg-slate-950/30 flex justify-center items-center">
+            <div className="p-4 overflow-auto flex-1 bg-slate-950/50 flex justify-center items-center">
               {previewDoc.fileType && previewDoc.fileType.includes('pdf') ? (
-                <iframe src={previewDoc.dataUrl} className="w-full h-[70vh] rounded-2xl border border-white/10" title="PDF Preview" />
+                <iframe src={previewDoc.dataUrl} className="w-full h-[70vh] rounded-xl border border-white/10 bg-white" title="PDF Preview" />
               ) : (
-                <img src={previewDoc.dataUrl} alt="Document Preview" className="max-w-full max-h-[70vh] object-contain rounded-2xl shadow-2xl shadow-black/30" />
+                <img src={previewDoc.dataUrl} alt="Document Preview" className="max-w-full max-h-[70vh] object-contain rounded-xl shadow-lg border border-white/10" />
               )}
             </div>
           </div>

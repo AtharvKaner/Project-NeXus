@@ -15,7 +15,12 @@ const QRCode = require('qrcode');
 const User = require('./models/User');
 const Request = require('./models/Request');
 const Due = require('./models/Due');
+const ReminderLog = require('./models/ReminderLog');
 const Razorpay = require('razorpay');
+
+// Initialize cron jobs
+require('./cronJobs');
+
 const app = express();
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
@@ -375,7 +380,7 @@ app.post('/api/signup', async (req, res) => {
     res.status(201).json({ token, user: { id: user._id, name: user.name, role: user.role, identifier: user.identifier } });
   } catch (err) {
     console.error('Signup Error:', err);
-    res.status(500).json({ message: 'Server error' });
+    console.error(err); res.status(500).json({ message: err.message });
   }
 });
 
@@ -402,7 +407,7 @@ app.post('/api/login', async (req, res) => {
     res.json({ success: true, token, role: user.role, name: user.name, id: user._id, identifier: user.identifier });
   } catch (err) {
     console.error('Login Error:', err);
-    res.status(500).json({ message: 'Server error' });
+    console.error(err); res.status(500).json({ message: err.message });
   }
 });
 
@@ -433,7 +438,7 @@ app.get('/api/requests', authMiddleware, async (req, res) => {
     res.json(mapped);
   } catch (err) {
     console.error('Signup Error:', err);
-    res.status(500).json({ message: 'Server error' });
+    console.error(err); res.status(500).json({ message: err.message });
   }
 });
 
@@ -454,7 +459,7 @@ app.get('/api/requests/:userId', authMiddleware, async (req, res) => {
     res.json(mapped);
   } catch (err) {
     console.error('Signup Error:', err);
-    res.status(500).json({ message: 'Server error' });
+    console.error(err); res.status(500).json({ message: err.message });
   }
 });
 
@@ -492,7 +497,7 @@ app.post('/api/requests', authMiddleware, async (req, res) => {
     });
   } catch (err) {
     console.error('Signup Error:', err);
-    res.status(500).json({ message: 'Server error' });
+    console.error(err); res.status(500).json({ message: err.message });
   }
 });
 
@@ -528,7 +533,7 @@ app.post('/api/requests/:id/approve', authMiddleware, async (req, res) => {
     res.status(403).json({ message: 'Invalid role' });
   } catch (err) {
     console.error('Signup Error:', err);
-    res.status(500).json({ message: 'Server error' });
+    console.error(err); res.status(500).json({ message: err.message });
   }
 });
 
@@ -555,7 +560,7 @@ app.post('/api/requests/:id/reject', authMiddleware, async (req, res) => {
     res.status(403).json({ message: 'Invalid role' });
   } catch (err) {
     console.error('Signup Error:', err);
-    res.status(500).json({ message: 'Server error' });
+    console.error(err); res.status(500).json({ message: err.message });
   }
 });
 
@@ -942,6 +947,44 @@ const verifyPaymentHandler = async (req, res) => {
 
 app.post('/api/verify-payment', authMiddleware, verifyPaymentHandler);
 app.post('/verify-payment', authMiddleware, verifyPaymentHandler);
+
+app.get('/api/admin/analytics', authMiddleware, async (req, res) => {
+  if (!['lab', 'hod', 'principal'].includes(req.user.role)) {
+    return res.status(403).json({ message: 'Only admins can view analytics' });
+  }
+
+  try {
+    const twoDaysAgo = new Date();
+    twoDaysAgo.setMinutes(twoDaysAgo.getMinutes() - 2);
+
+    const totalPending = await Request.countDocuments({ finalStatus: 'pending' });
+    const overdueRequests = await Request.countDocuments({ finalStatus: 'pending', updatedAt: { $lt: twoDaysAgo } });
+
+    // Calculate authority-wise pending
+    const requests = await Request.find({ finalStatus: 'pending' });
+    let authorityWise = { lab: 0, hod: 0, principal: 0 };
+    requests.forEach(req => {
+      if (req.status.lab.state === 'pending') authorityWise.lab++;
+      else if (req.status.lab.state === 'approved' && req.status.hod.state === 'pending') authorityWise.hod++;
+      else if (req.status.lab.state === 'approved' && req.status.hod.state === 'approved' && req.status.principal.state === 'pending') authorityWise.principal++;
+    });
+
+    const reminderHistory = await ReminderLog.find()
+      .populate('studentId', 'name identifier')
+      .sort({ reminderDate: -1 })
+      .limit(50);
+
+    res.json({
+      totalPending,
+      overdueRequests,
+      authorityWise,
+      reminderHistory
+    });
+  } catch (error) {
+    console.error('Failed to fetch analytics:', error);
+    res.status(500).json({ message: 'Failed to fetch analytics' });
+  }
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

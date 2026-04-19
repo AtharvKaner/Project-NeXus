@@ -7,6 +7,7 @@ import Signup from './components/Signup';
 import StudentDashboard from './components/StudentDashboard';
 import AdminDashboard from './components/AdminDashboard';
 import VerifyPage from './components/VerifyPage';
+import InteractiveBackground from './components/InteractiveBackground';
 import { LogOut, BookOpen } from 'lucide-react';
 
 function App() {
@@ -33,10 +34,11 @@ function App() {
   return (
     <Router>
       <div className="relative min-h-screen overflow-hidden flex flex-col text-slate-100">
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="aurora-blob absolute -top-28 left-[-7rem] h-80 w-80 rounded-full bg-violet-500/20 blur-3xl" />
-          <div className="aurora-blob absolute top-20 right-[-6rem] h-96 w-96 rounded-full bg-indigo-500/16 blur-3xl [animation-delay:2s]" />
-          <div className="aurora-blob absolute bottom-[-5rem] left-1/3 h-80 w-80 rounded-full bg-cyan-500/16 blur-3xl [animation-delay:4s]" />
+        <InteractiveBackground />
+        <div className="pointer-events-none absolute inset-0 overflow-hidden mix-blend-screen">
+          <div className="aurora-blob absolute -top-28 left-[-7rem] h-80 w-80 rounded-full bg-blue-500/10 blur-3xl" />
+          <div className="aurora-blob absolute top-20 right-[-6rem] h-96 w-96 rounded-full bg-cyan-500/10 blur-3xl [animation-delay:2s]" />
+          <div className="aurora-blob absolute bottom-[-5rem] left-1/3 h-80 w-80 rounded-full bg-indigo-500/10 blur-3xl [animation-delay:4s]" />
           <div className="sparkle-layer" />
           <div className="sparkle-layer-alt" />
         </div>
@@ -49,7 +51,7 @@ function App() {
         >
           <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
             <div className="flex items-center gap-3">
-              <div className="rounded-2xl border border-white/10 bg-white/10 p-2 text-cyan-300 shadow-lg shadow-cyan-950/20">
+              <div className="rounded-2xl border border-white/10 bg-white/10 p-2 text-orange-400 shadow-lg shadow-orange-950/20">
                 <BookOpen size={22} />
               </div>
               <span className="text-lg font-semibold tracking-wide text-white">Project Nexus</span>

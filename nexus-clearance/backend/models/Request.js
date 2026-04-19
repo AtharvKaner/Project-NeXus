@@ -19,7 +19,7 @@ const requestSchema = new mongoose.Schema({
     libraryReceipt: { name: String, fileType: String, dataUrl: String },
     labClearance: { name: String, fileType: String, dataUrl: String }
   },
-  certId: { type: String, unique: true, sparse: true, default: null },
+  certId: { type: String, unique: true, sparse: true },
   certificateIssuedAt: { type: Date, default: null },
   finalStatus: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' }
 }, { timestamps: true });

@@ -1,34 +1,27 @@
 import { motion } from 'framer-motion';
 import { ShieldCheck, Download, Sparkles } from 'lucide-react';
+import QRCode from 'qrcode';
+import { useEffect, useState } from 'react';
 
 function Certificate({ request, dues = [] }) {
+  const [qrCodeUrl, setQrCodeUrl] = useState('');
   const departmentLabel = dues.length > 0
     ? [...new Set(dues.map((due) => due.department).filter(Boolean))].join(', ')
     : 'Institutional Clearance';
-  const certificateId = `NXS-${String(request.id || request.studentId || '').slice(0, 8).toUpperCase()}`;
-  const verifyUrl = `${window.location.origin}/verify/${request?.certId || certificateId}`;
+  const certificateId = `NXS-${String(request?.id || request?.studentId || '').slice(0, 8).toUpperCase()}`;
+  const verifyUrl = `https://fragrant-setback-nursing.ngrok-free.dev/verify/${request?.certId || certificateId}`;
 
-  const buildQrPattern = (seed) => {
-    const size = 21;
-    const hash = [...seed].reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    return Array.from({ length: size }, (_, row) =>
-      Array.from({ length: size }, (_, col) => {
-        const inFinder = (
-          (row < 7 && col < 7) ||
-          (row < 7 && col > size - 8) ||
-          (row > size - 8 && col < 7)
-        );
-        if (inFinder) {
-          const edge = row === 0 || col === 0 || row === 6 || col === 6;
-          const inner = row >= 2 && row <= 4 && col >= 2 && col <= 4;
-          return edge || inner;
-        }
-        return ((row * 13 + col * 7 + hash) % 5 === 0);
-      })
-    );
-  };
-
-  const qrMatrix = buildQrPattern(request?.certId || certificateId);
+  useEffect(() => {
+    QRCode.toDataURL(verifyUrl, {
+      errorCorrectionLevel: 'M',
+      width: 256,
+      margin: 1,
+      color: {
+        dark: '#0f172a',
+        light: '#ffffff'
+      }
+    }).then(url => setQrCodeUrl(url)).catch(err => console.error(err));
+  }, [verifyUrl]);
 
   return (
     <motion.div
@@ -52,18 +45,18 @@ function Certificate({ request, dues = [] }) {
           <div className="mx-auto mt-4 h-px w-40 bg-slate-400" />
 
           <p className="mx-auto mt-10 max-w-3xl text-base md:text-lg leading-8 text-slate-700">
-            This is to certify that the above-mentioned student <span className="font-bold text-slate-900">({request.studentName})</span> has cleared all dues and is eligible for clearance.
+            This is to certify that <span className="font-bold text-slate-900 uppercase tracking-wide">{request?.studentName || 'the student'}</span> has cleared all institutional dues and is officially eligible for final clearance.
           </p>
 
           <div className="mx-auto mt-10 max-w-3xl rounded-2xl border border-slate-200 bg-slate-50/90 p-6 text-left shadow-sm">
             <div className="grid gap-4 md:grid-cols-2">
               <div>
                 <div className="text-xs font-bold uppercase tracking-[0.25em] text-slate-500">Student Name</div>
-                <div className="mt-1 text-lg font-semibold text-slate-900">{request.studentName}</div>
+                <div className="mt-1 text-lg font-semibold text-slate-900">{request?.studentName || 'Not specified'}</div>
               </div>
               <div>
                 <div className="text-xs font-bold uppercase tracking-[0.25em] text-slate-500">Student ID / Roll Number</div>
-                <div className="mt-1 text-lg font-semibold text-slate-900">{request.studentIdentifier || request.studentId}</div>
+                <div className="mt-1 text-lg font-semibold text-slate-900">{request?.studentIdentifier || request?.studentId || 'Not specified'}</div>
               </div>
               <div className="md:col-span-2">
                 <div className="text-xs font-bold uppercase tracking-[0.25em] text-slate-500">Department</div>
@@ -75,7 +68,7 @@ function Certificate({ request, dues = [] }) {
           <div className="mt-12 flex flex-col items-start justify-between gap-8 md:flex-row md:items-end">
             <div className="text-left text-slate-700">
               <div className="text-xs font-bold uppercase tracking-[0.3em] text-slate-500">Issue Date</div>
-              <div className="mt-2 text-base font-semibold text-slate-900">{new Date().toLocaleDateString()}</div>
+              <div className="mt-2 text-base font-semibold text-slate-900">{new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' })}</div>
             </div>
 
             <div className="w-full max-w-xs text-right">
@@ -90,16 +83,13 @@ function Certificate({ request, dues = [] }) {
             <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/15 bg-emerald-500/10 px-4 py-2 text-sm font-semibold text-emerald-700 md:self-end">
               <ShieldCheck size={16} /> Official document
             </div>
-            <div className="w-full max-w-[250px] rounded-3xl border border-cyan-400/20 bg-cyan-500/5 p-3 text-center shadow-[0_0_0_1px_rgba(34,211,238,0.08),0_0_30px_rgba(34,211,238,0.12)] md:ml-auto">
+            <div className="w-full max-w-[250px] rounded-3xl border border-cyan-400/20 bg-cyan-500/5 p-4 text-center shadow-[0_0_0_1px_rgba(34,211,238,0.08),0_0_30px_rgba(34,211,238,0.12)] md:ml-auto backdrop-blur-md">
               <div className="mb-3 text-[10px] font-bold uppercase tracking-[0.28em] text-slate-500">Verification QR</div>
-              <div className="mx-auto grid h-36 w-36 grid-cols-21 overflow-hidden rounded-xl border border-slate-200 bg-white p-1 shadow-inner">
-                {qrMatrix.flatMap((row, rowIndex) =>
-                  row.map((cell, colIndex) => (
-                    <div
-                      key={`${rowIndex}-${colIndex}`}
-                      className={`aspect-square w-full ${cell ? 'bg-slate-900' : 'bg-white'}`}
-                    />
-                  ))
+              <div className="mx-auto flex h-36 w-36 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-white p-2 shadow-inner">
+                {qrCodeUrl ? (
+                  <img src={qrCodeUrl} alt="Verification QR" className="h-full w-full object-contain" />
+                ) : (
+                  <div className="h-full w-full bg-slate-100 animate-pulse rounded-lg"></div>
                 )}
               </div>
               <div className="mt-2 text-center text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500">

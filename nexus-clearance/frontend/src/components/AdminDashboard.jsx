@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { CheckCircle, XCircle, Search, Filter, Inbox, Eye, FileText, Image as ImageIcon, X, Table2, Download, RefreshCw, CircleDollarSign } from 'lucide-react';
+import { CheckCircle, XCircle, Search, Filter, Inbox, Eye, FileText, Image as ImageIcon, X, Table2, Download, RefreshCw, CircleDollarSign, Bell } from 'lucide-react';
 
 const API_URL = 'http://localhost:3000';
 
@@ -11,6 +11,8 @@ function AdminDashboard({ user }) {
   const [duesLoading, setDuesLoading] = useState(false);
   const [showDuesTable, setShowDuesTable] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [analytics, setAnalytics] = useState(null);
+  const [showNotifications, setShowNotifications] = useState(false);
   
   const [reviewingId, setReviewingId] = useState(null);
   const [reviewType, setReviewType] = useState(null); 
@@ -55,9 +57,22 @@ function AdminDashboard({ user }) {
     }
   };
 
+  const fetchAnalytics = async () => {
+    try {
+      const res = await fetch(`${API_URL}/api/admin/analytics`, {
+        headers: { 'Authorization': `Bearer ${user.token}` }
+      });
+      const data = await res.json();
+      if (res.ok) setAnalytics(data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   useEffect(() => {
     fetchRequests();
     fetchDues();
+    fetchAnalytics();
   }, []);
 
   const submitReview = async (id) => {
@@ -184,6 +199,14 @@ function AdminDashboard({ user }) {
       .some((value) => (value || '').toString().toLowerCase().includes(query));
   });
 
+  const authorityNamesMap = {
+    lab: 'Laboratory',
+    hod: 'HOD',
+    principal: 'Principal'
+  };
+  const myAuthorityName = authorityNamesMap[user.role];
+  const myNotifications = analytics?.reminderHistory?.filter(log => log.authorityName === myAuthorityName) || [];
+
   return (
     <div className="animate-[fade-in_0.5s_ease] w-full max-w-5xl mx-auto">
       
@@ -204,7 +227,7 @@ function AdminDashboard({ user }) {
             View Dues Table
           </button>
           <button
-            onClick={() => { fetchDues(); fetchRequests(); }}
+            onClick={() => { fetchDues(); fetchRequests(); fetchAnalytics(); }}
             className="inline-flex items-center gap-2 rounded-xl bg-cyan-500 px-4 py-2 text-sm font-semibold text-slate-950 transition-colors hover:bg-cyan-400"
           >
             <RefreshCw size={16} />
@@ -232,6 +255,46 @@ function AdminDashboard({ user }) {
           <button className="rounded-xl border border-white/10 bg-white/5 p-2 text-slate-300 transition-colors hover:bg-white/10" title="Filter (mock)">
             <Filter size={18} />
           </button>
+          
+          <div className="relative">
+            <button
+              onClick={() => setShowNotifications(!showNotifications)}
+              className="relative rounded-xl border border-white/10 bg-white/5 p-2 text-slate-300 transition-colors hover:bg-white/10 hover:text-cyan-400"
+              title="Notifications"
+            >
+              <Bell size={18} />
+              {myNotifications.length > 0 && (
+                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[9px] font-bold text-white shadow-[0_0_10px_rgba(244,63,94,0.5)]">
+                  {myNotifications.length}
+                </span>
+              )}
+            </button>
+            
+            {showNotifications && (
+              <div className="absolute right-0 top-full mt-2 w-80 rounded-2xl border border-white/10 bg-slate-900/95 p-4 shadow-2xl backdrop-blur-3xl z-50">
+                <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-400">System Notifications</h3>
+                {myNotifications.length === 0 ? (
+                  <p className="text-sm text-slate-500">No recent automated emails sent for you.</p>
+                ) : (
+                  <div className="flex flex-col gap-3 max-h-64 overflow-y-auto pr-1 custom-scrollbar">
+                    {myNotifications.slice(0, 5).map((log, i) => (
+                      <div key={i} className="flex flex-col gap-1 rounded-xl bg-white/5 p-3 border border-white/5 transition-colors hover:bg-white/10 hover:border-cyan-500/30">
+                        <p className="text-xs text-slate-300">
+                          Automated Email Reminder sent regarding student <span className="font-semibold text-cyan-300">{log.studentId?.name || 'Unknown'}</span>.
+                        </p>
+                        <p className="text-[10px] text-slate-500">{new Date(log.reminderDate).toLocaleString()}</p>
+                      </div>
+                    ))}
+                    {myNotifications.length > 5 && (
+                      <button className="text-xs font-semibold text-cyan-400 hover:text-cyan-300 text-center mt-2 pb-1">
+                        View all ({myNotifications.length})
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -242,8 +305,32 @@ function AdminDashboard({ user }) {
         </div>
       )}
 
+      {/* Analytics Section */}
+      {analytics && (
+        <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-4">
+          <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-5 shadow-2xl backdrop-blur-3xl flex flex-col justify-center transition-all hover:bg-white/5">
+            <p className="text-sm font-semibold uppercase tracking-wider text-slate-400">Total Pending</p>
+            <p className="mt-1 text-3xl font-black text-white">{analytics.totalPending}</p>
+          </div>
+          <div className="rounded-2xl border border-rose-500/20 bg-rose-500/10 p-5 shadow-2xl backdrop-blur-3xl flex flex-col justify-center transition-all hover:bg-rose-500/20">
+            <p className="text-sm font-semibold uppercase tracking-wider text-rose-300">Overdue (&gt; 2 mins)</p>
+            <p className="mt-1 text-3xl font-black text-rose-200">{analytics.overdueRequests}</p>
+          </div>
+          <div className="rounded-2xl border border-cyan-500/20 bg-cyan-500/10 p-5 shadow-2xl backdrop-blur-3xl flex flex-col justify-center transition-all hover:bg-cyan-500/20">
+            <p className="text-sm font-semibold uppercase tracking-wider text-cyan-300">Reminders Sent</p>
+            <p className="mt-1 text-3xl font-black text-cyan-200">{analytics.reminderHistory.length}</p>
+          </div>
+          <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-4 shadow-2xl backdrop-blur-3xl flex flex-col justify-center transition-all hover:bg-white/5">
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Authority Queue</p>
+            <div className="flex justify-between text-sm font-medium text-slate-300 mb-1"><span className="text-slate-400">Laboratory:</span> <span className="text-white">{analytics.authorityWise.lab}</span></div>
+            <div className="flex justify-between text-sm font-medium text-slate-300 mb-1"><span className="text-slate-400">HOD:</span> <span className="text-white">{analytics.authorityWise.hod}</span></div>
+            <div className="flex justify-between text-sm font-medium text-slate-300"><span className="text-slate-400">Principal:</span> <span className="text-white">{analytics.authorityWise.principal}</span></div>
+          </div>
+        </div>
+      )}
+
       {/* Main List Area */}
-      <div className="glass-card overflow-hidden rounded-3xl border-white/10">
+      <div className="overflow-hidden rounded-2xl border border-white/10 bg-slate-900/60 shadow-2xl backdrop-blur-3xl">
         {actionableRequests.length === 0 ? (
           <div className="p-12 text-center">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full border border-white/10 bg-white/5 text-slate-300">
@@ -269,7 +356,7 @@ function AdminDashboard({ user }) {
                         </span>
                       )}
                     </div>
-                    <p className="mt-1 text-sm text-slate-400">Submitted on {new Date(req.createdAt).toLocaleDateString()}</p>
+                    <p className="mt-1 text-sm text-slate-400">Submitted on {new Date(req.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' })}</p>
                   </div>
                   
                   <div className="flex items-center gap-2">
@@ -404,7 +491,7 @@ function AdminDashboard({ user }) {
       {/* Dues Table Modal */}
       {showDuesTable && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-xl" onClick={() => setShowDuesTable(false)}>
-            <div className="glass-card w-full max-w-6xl max-h-[90vh] overflow-hidden rounded-3xl border-white/10" onClick={(e) => e.stopPropagation()}>
+            <div className="w-full max-w-6xl max-h-[90vh] overflow-hidden rounded-2xl border border-white/10 bg-slate-900/80 shadow-2xl backdrop-blur-3xl flex flex-col" onClick={(e) => e.stopPropagation()}>
               <div className="flex items-start justify-between gap-4 border-b border-white/10 px-6 py-5 bg-white/5">
               <div>
                   <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-cyan-200">
@@ -504,7 +591,7 @@ function AdminDashboard({ user }) {
       {/* Admin Document Preview Modal */}
       {previewDoc && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-xl" onClick={() => setPreviewDoc(null)}>
-          <div className="glass-card flex w-full max-w-4xl max-h-[90vh] flex-col overflow-hidden rounded-3xl border-white/10" onClick={e => e.stopPropagation()}>
+          <div className="flex w-full max-w-4xl max-h-[90vh] flex-col overflow-hidden rounded-2xl border border-white/10 bg-slate-900/80 shadow-2xl backdrop-blur-3xl" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between border-b border-white/10 p-4 bg-white/5">
               <div>
                 <h3 className="text-lg font-bold text-white">{previewDoc.name}</h3>

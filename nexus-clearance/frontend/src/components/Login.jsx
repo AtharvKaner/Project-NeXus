@@ -58,7 +58,7 @@ function Login({ setUser }) {
 
       <div className="glass-panel neon-border p-8 sm:p-10">
         <div className="mb-8 flex flex-col items-center">
-          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-500/20 to-violet-500/20 text-cyan-200 shadow-lg shadow-cyan-950/20">
+          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 text-cyan-200 shadow-lg shadow-cyan-950/20">
             <ShieldCheck size={32} />
           </div>
           <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.28em] text-slate-300">
